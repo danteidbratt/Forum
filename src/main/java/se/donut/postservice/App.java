@@ -20,9 +20,11 @@ import se.donut.postservice.repository.postgresql.PostgresCommentDAO;
 import se.donut.postservice.repository.postgresql.PostgresForumDAO;
 import se.donut.postservice.repository.postgresql.PostgresPostDAO;
 import se.donut.postservice.repository.postgresql.PostgresUserDAO;
+import se.donut.postservice.resource.CommentResource;
 import se.donut.postservice.resource.ForumResource;
 import se.donut.postservice.resource.PostResource;
 import se.donut.postservice.resource.UserResource;
+import se.donut.postservice.service.CommentService;
 import se.donut.postservice.service.ForumService;
 import se.donut.postservice.service.PostService;
 import se.donut.postservice.service.UserService;
@@ -85,13 +87,16 @@ public class App extends Application<AppConfig> {
         UserResource userResource = new UserResource(userService);
 
         PostAccessor postAccessor = new PostgresPostDAO(jdbi);
-        CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
-        PostService postService = new PostService(postAccessor, commentAccessor);
+        PostService postService = new PostService(postAccessor);
         PostResource postResource = new PostResource(postService);
 
         ForumAccessor forumAccessor = new PostgresForumDAO(jdbi);
         ForumService forumService = new ForumService(forumAccessor);
         ForumResource forumResource = new ForumResource(forumService);
+
+        CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
+        CommentService commentService = new CommentService(commentAccessor);
+        CommentResource commentResource = new CommentResource(commentService);
 
         jdbi.registerRowMapper(new UserMapper());
         jdbi.registerRowMapper(new ForumMapper());
@@ -101,6 +106,7 @@ public class App extends Application<AppConfig> {
         environment.jersey().register(userResource);
         environment.jersey().register(postResource);
         environment.jersey().register(forumResource);
+        environment.jersey().register(commentResource);
         environment.jersey().register(JdbiExceptionsBundle.class);
     }
 

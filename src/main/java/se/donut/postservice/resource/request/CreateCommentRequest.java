@@ -7,8 +7,10 @@ import java.util.UUID;
 
 @Setter
 @Getter
-public class CreateCommentRequest extends CreateEntryRequest {
+public class CreateCommentRequest {
 
-    private UUID parentEntryUuid;
+    private UUID authorUuid;
+    private String authorName;
+    private String content;
 
 }

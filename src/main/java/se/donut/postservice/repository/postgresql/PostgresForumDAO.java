@@ -15,7 +15,7 @@ public class PostgresForumDAO extends PostgresAbstractDAO implements ForumAccess
                 handle.createUpdate("INSERT INTO forum " +
                         "(uuid, created_by, name, description, created_at, is_deleted) " +
                         "VALUES " +
-                        "(:uuid, :authorUuid, :name, :description, :createdAt, :isDeleted)"
+                        "(:uuid, :createdBy, :name, :description, :createdAt, :isDeleted)"
                 ).bindBean(forum)
                 .execute()
         );

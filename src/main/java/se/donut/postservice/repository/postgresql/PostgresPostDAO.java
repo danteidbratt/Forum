@@ -13,9 +13,9 @@ public class PostgresPostDAO extends PostgresAbstractDAO implements PostAccessor
     public void createPost(Post post) {
         jdbi.useHandle(handle ->
                 handle.createUpdate("INSERT INTO post " +
-                        "(uuid, created_by, content, score, created_at, is_deleted, forum_uuid, title, link) " +
+                        "(uuid, author_uuid, author_name, content, score, created_at, is_deleted, forum_uuid, title, link) " +
                         "VALUES " +
-                        "(:uuid, :authorUuid, :content, :score, :createdAt, :isDeleted, :forumUuid, :title, :link)"
+                        "(:uuid, :authorUuid, :authorName, :content, :score, :createdAt, :isDeleted, :forumUuid, :title, :link)"
                 ).bindBean(post).execute()
         );
     }

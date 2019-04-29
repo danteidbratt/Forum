@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface CommentAccessor {
 
-    List<Comment> getComments(UUID forumUuid, UUID postUuid, List<UUID> path);
+    List<Comment> getComments(UUID parentUuid);
 
     void createComment(Comment comment);
 
