@@ -3,7 +3,7 @@ package se.donut.postservice.model.mapper;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 import se.donut.postservice.model.domain.User;
-import se.donut.postservice.model.domain.UserRole;
+import se.donut.postservice.model.domain.Role;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +16,7 @@ public class UserMapper implements RowMapper<User> {
                 UUID.fromString(rs.getString("uuid")),
                 rs.getString("name"),
                 rs.getInt("carma"),
-                UserRole.valueOf(rs.getString("role")),
+                Role.valueOf(rs.getString("role")),
                 rs.getTimestamp("created_at").toInstant(),
                 rs.getBoolean("is_deleted")
         );

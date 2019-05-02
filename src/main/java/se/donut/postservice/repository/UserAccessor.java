@@ -11,6 +11,8 @@ public interface UserAccessor {
 
     Optional<User> getUser(String name);
 
-    void createUser(User user);
+    void createUser(User user, String password);
+
+    Optional<User> authenticate(String username, String password);
 
 }

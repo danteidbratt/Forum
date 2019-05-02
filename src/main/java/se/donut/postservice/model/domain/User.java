@@ -13,11 +13,11 @@ public class User {
     private UUID uuid;
     private String name;
     private Integer carma;
-    private UserRole role;
+    private Role role;
     private Instant createdAt;
     private Boolean isDeleted;
 
     public UserDTO toApiModel() {
-        return new UserDTO(this.uuid, this.name, this.carma);
+        return new UserDTO(this.uuid, this.name, this.carma, this.role);
     }
 }

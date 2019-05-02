@@ -6,11 +6,11 @@ import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.UserAccessor;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
-import static se.donut.postservice.exception.ExceptionType.NAME_ALREADY_TAKEN;
-import static se.donut.postservice.exception.ExceptionType.USER_NOT_FOUND;
-import static se.donut.postservice.model.domain.UserRole.MEMBER;
+import static se.donut.postservice.exception.ExceptionType.*;
+import static se.donut.postservice.model.domain.Role.MEMBER;
 
 public class UserService {
 
@@ -20,27 +20,50 @@ public class UserService {
         this.userAccessor = userAccessor;
     }
 
-    public UserDTO getPoster(UUID posterUuid) {
-        User user = userAccessor.getUser(posterUuid)
+    public UserDTO getUser(UUID userUuid) {
+        User user = userAccessor.getUser(userUuid)
                 .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
         return user.toApiModel();
     }
 
-    public UUID createPoster(String name) {
-        userAccessor.getUser(name).ifPresent(d -> {
-            throw new PostServiceException(NAME_ALREADY_TAKEN);
-        });
+    public UUID createUser(String username, String password) {
+        validateNewUser(username, password);
+
         UUID userUuid = UUID.randomUUID();
         User user = new User(
                 userUuid,
-                name,
+                username,
                 0,
                 MEMBER,
                 Instant.now(),
                 false
         );
-        userAccessor.createUser(user);
+        userAccessor.createUser(user, password);
         return userUuid;
+    }
+
+    public UserDTO login(String username, String password) {
+        Optional<User> user = userAccessor.authenticate(username, password);
+        if (user.isPresent()) {
+            return user.get().toApiModel();
+        }
+        throw new PostServiceException(LOGIN_FAILED);
+    }
+
+    private void validateNewUser(String username, String password) {
+        userAccessor.getUser(username).ifPresent(d -> {
+            throw new PostServiceException(NAME_ALREADY_TAKEN);
+        });
+
+        if (username.length() < 3) {
+            // TODO: fix type
+            throw new PostServiceException(NAME_ALREADY_TAKEN);
+        }
+        if (password.length() < 3) {
+            // TODO: fix type
+            throw new PostServiceException(NAME_ALREADY_TAKEN);
+        }
+
     }
 
 }

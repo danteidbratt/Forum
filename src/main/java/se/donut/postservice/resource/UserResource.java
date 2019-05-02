@@ -1,9 +1,12 @@
 package se.donut.postservice.resource;
 
+import io.dropwizard.auth.Auth;
+import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.resource.request.CreateUserRequest;
 import se.donut.postservice.service.UserService;
 
+import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -20,16 +23,20 @@ public class UserResource {
         this.userService = userService;
     }
 
-    @Path("{authorUuid}")
+    @PermitAll
+    @Path("{userUuid}")
     @GET
-    public Response getUser(@PathParam("authorUuid") UUID userUuid) {
-        UserDTO userDTO = userService.getPoster(userUuid);
+    public Response getUser(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("userUuid") UUID userUuid
+    ) {
+        UserDTO userDTO = userService.getUser(userUuid);
         return Response.ok(userDTO).build();
     }
 
     @POST
     public Response createUser(CreateUserRequest request) {
-        UUID uuid = userService.createPoster(request.getName());
-        return Response.ok(uuid).build();
+        userService.createUser(request.getUsername(), request.getPassword());
+        return Response.ok().build();
     }
 }

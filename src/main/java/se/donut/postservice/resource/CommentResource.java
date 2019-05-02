@@ -1,9 +1,12 @@
 package se.donut.postservice.resource;
 
+import io.dropwizard.auth.Auth;
+import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.resource.request.CreateCommentRequest;
 import se.donut.postservice.service.CommentService;
 
+import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -39,33 +42,43 @@ public class CommentResource {
         return commentService.getComments(commentUuid);
     }
 
+    @PermitAll
     @POST
     public Response commentOnPost(
+            @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
             @PathParam("postUuid") UUID postUuid,
-            CreateCommentRequest request) {
-        UUID uuid = createComment(postUuid, postUuid, request);
+            CreateCommentRequest request
+    ) {
+        UUID uuid = commentService.createComment(
+                postUuid,
+                postUuid,
+                authenticatedUser.getUuid(),
+                authenticatedUser.getName(),
+                request.getContent()
+        );
         return Response.ok(uuid).build();
     }
 
+    @PermitAll
     @Path("{commentUuid}")
     @POST
     public Response commentOnComment(
+            @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
             @PathParam("postUuid") UUID postUuid,
             @PathParam("commentUuid") UUID commentUuid,
-            CreateCommentRequest request) {
-        UUID uuid = createComment(postUuid, commentUuid, request);
-        return Response.ok(uuid).build();
-    }
+            CreateCommentRequest request
+    ) {
+        // TODO: Verify that parent comment is tied to the correct post
 
-    private UUID createComment(UUID postUuid, UUID parentUuid, CreateCommentRequest request) {
-        return commentService.createComment(
+        UUID uuid = commentService.createComment(
                 postUuid,
-                parentUuid,
-                request.getAuthorUuid(),
-                request.getAuthorName(),
+                commentUuid,
+                authenticatedUser.getUuid(),
+                authenticatedUser.getName(),
                 request.getContent()
         );
+        return Response.ok(uuid).build();
     }
 }

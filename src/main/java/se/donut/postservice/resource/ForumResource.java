@@ -1,5 +1,7 @@
 package se.donut.postservice.resource;
 
+import io.dropwizard.auth.Auth;
+import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.resource.request.CreateForumRequest;
 import se.donut.postservice.service.ForumService;
 
@@ -23,9 +25,12 @@ public class ForumResource {
     }
 
     @POST
-    public Response createForum(CreateForumRequest request) {
+    public Response createForum(
+            @Auth AuthenticatedUser user,
+            CreateForumRequest request
+    ) {
         UUID uuid = forumService.createForum(
-                request.getUserUuid(),
+                user.getUuid(),
                 request.getName(),
                 request.getDescription()
         );

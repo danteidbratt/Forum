@@ -28,14 +28,30 @@ public class PostgresUserDAO extends PostgresAbstractDAO implements UserAccessor
         );
     }
 
-    public void createUser(User user) {
-        jdbi.useHandle(handle ->
-                handle.createUpdate("INSERT INTO users " +
-                        "(uuid, name, role, created_at, carma, is_deleted) " +
-                        "VALUES " +
-                        "(:uuid, :name, :role, :createdAt, :carma, :isDeleted)")
-                        .bindBean(user)
-                        .execute()
+    public void createUser(User user, String password) {
+        jdbi.useTransaction(handle -> {
+            handle.createUpdate("INSERT INTO users " +
+                    "(uuid, name, role, created_at, carma, is_deleted) " +
+                    "VALUES " +
+                    "(:uuid, :name, :role, :createdAt, :carma, :isDeleted)")
+                    .bindBean(user)
+                    .execute();
+            handle.createUpdate("INSERT INTO vault (user_uuid, password) values (:userUuid, :password)")
+                    .bind("password", password)
+                    .bind("userUuid", user.getUuid())
+                    .execute();
+        });
+    }
+
+    public Optional<User> authenticate(String username, String password) {
+        return jdbi.withHandle(handle ->
+                handle.createQuery("SELECT u.* FROM users u " +
+                        "INNER JOIN vault v ON u.uuid = v.user_uuid " +
+                        "WHERE u.name = :username AND v.password = :password")
+                        .bind("username", username)
+                        .bind("password", password)
+                        .mapTo(User.class)
+                        .findFirst()
         );
     }
 

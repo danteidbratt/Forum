@@ -19,7 +19,6 @@ public class ForumService {
         Forum forum = new Forum(
                 forumUuid,
                 userUuid,
-                name,
                 description,
                 Instant.now(),
                 false

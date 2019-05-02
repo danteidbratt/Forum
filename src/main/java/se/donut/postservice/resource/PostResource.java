@@ -1,13 +1,14 @@
 package se.donut.postservice.resource;
 
-import se.donut.postservice.model.api.CommentDTO;
+import io.dropwizard.auth.Auth;
+import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.resource.request.CreatePostRequest;
 import se.donut.postservice.service.PostService;
 
+import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 import java.util.UUID;
 
 @Path("forums/{forumUuid}/posts")
@@ -21,19 +22,27 @@ public class PostResource {
         this.postService = postService;
     }
 
+    @PermitAll
     @POST
     public Response createPost(
+            @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
             CreatePostRequest request
     ) {
         UUID uuid = postService.createPost(
                 forumUuid,
-                request.getAuthorUuid(),
-                request.getAuthorName(),
+                authenticatedUser.getUuid(),
+                authenticatedUser.getName(),
                 request.getTitle(),
                 request.getLink(),
                 request.getContent()
         );
         return Response.ok(uuid).build();
+    }
+
+    @Path("{postUuid}")
+    @GET
+    public void getPost(@PathParam("postUuid") UUID postUuid) {
+
     }
 }

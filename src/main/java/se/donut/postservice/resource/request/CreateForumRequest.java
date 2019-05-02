@@ -9,7 +9,6 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CreateForumRequest {
 
-    private UUID userUuid;
     private String name;
     private String description;
 

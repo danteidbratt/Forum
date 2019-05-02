@@ -4,8 +4,8 @@ import org.jdbi.v3.core.Jdbi;
 import se.donut.postservice.model.domain.Comment;
 import se.donut.postservice.repository.CommentAccessor;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAccessor {
@@ -22,12 +22,21 @@ public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAc
         super(jdbi);
     }
 
+
     @Override
+    public Optional<Comment> getComment(UUID uuid) {
+        return jdbi.withHandle(handle ->
+                handle.createQuery(
+                        "SELECT * FROM comment WHERE uuid = :uuid"
+                ).bind("uuid", uuid).mapTo(Comment.class).findFirst()
+        );
+    }
+
     public List<Comment> getComments(UUID parentUUid) {
         List<Comment> comments = jdbi.withHandle(handle ->
-            handle.createQuery(
-                    "SELECT * FROM comment WHERE parent_uuid = :parentUuid"
-            ).bind("parentUuid", parentUUid).mapTo(Comment.class).list()
+                handle.createQuery(
+                        "SELECT * FROM comment WHERE parent_uuid = :parentUuid"
+                ).bind("parentUuid", parentUUid).mapTo(Comment.class).list()
         );
         return comments;
     }

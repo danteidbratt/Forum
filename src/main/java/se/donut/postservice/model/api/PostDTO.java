@@ -11,14 +11,16 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentDTO {
+public class PostDTO {
 
     private UUID uuid;
     private UUID authorUuid;
     private String authorName;
+    private String title;
+    private String link;
     private String content;
     private int score;
     private Instant createdAt;
-    List<CommentDTO> children;
+    private List<CommentDTO> comments;
 
 }
