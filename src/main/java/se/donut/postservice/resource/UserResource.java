@@ -10,6 +10,7 @@ import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.util.UUID;
 
 @Path("users")
@@ -18,25 +19,24 @@ import java.util.UUID;
 public class UserResource {
 
     private final UserService userService;
+    private final UriBuilder uriBuilder = UriBuilder.fromResource(UserResource.class);
 
     public UserResource(UserService userService) {
         this.userService = userService;
     }
 
-    @PermitAll
     @Path("{userUuid}")
     @GET
-    public Response getUser(
-            @Auth AuthenticatedUser authenticatedUser,
+    public UserDTO getUser(
             @PathParam("userUuid") UUID userUuid
     ) {
-        UserDTO userDTO = userService.getUser(userUuid);
-        return Response.ok(userDTO).build();
+        return userService.getUser(userUuid);
     }
 
     @POST
     public Response createUser(CreateUserRequest request) {
-        userService.createUser(request.getUsername(), request.getPassword());
-        return Response.ok().build();
+        UUID uuid = userService.createUser(request.getUsername(), request.getPassword());
+        return Response.ok(uuid).build();
+//        return Response.created(uriBuilder.path(uuid.toString()).build()).build();
     }
 }

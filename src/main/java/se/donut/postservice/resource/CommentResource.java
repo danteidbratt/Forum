@@ -2,15 +2,14 @@ package se.donut.postservice.resource;
 
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
-import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.resource.request.CreateCommentRequest;
+import se.donut.postservice.resource.request.VoteRequest;
 import se.donut.postservice.service.CommentService;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 import java.util.UUID;
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,24 +21,6 @@ public class CommentResource {
 
     public CommentResource(CommentService commentService) {
         this.commentService = commentService;
-    }
-
-    @GET
-    public List<CommentDTO> getComments(
-            @PathParam("forumUuid") UUID forumUuid,
-            @PathParam("postUuid") UUID postUuid
-    ) {
-        return commentService.getComments(postUuid);
-    }
-
-    @Path("{commentUuid}/children")
-    @GET
-    public List<CommentDTO> getNestedComments(
-            @PathParam("forumUuid") UUID forumUuid,
-            @PathParam("postUuid") UUID postUuid,
-            @PathParam("commentUuid") UUID commentUuid
-    ) {
-        return commentService.getComments(commentUuid);
     }
 
     @PermitAll
@@ -80,5 +61,20 @@ public class CommentResource {
                 request.getContent()
         );
         return Response.ok(uuid).build();
+    }
+
+    @PermitAll
+    @Path("{commentUuid}/vote")
+    @POST
+    public void voteOnComment(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("commentUuid") UUID commentUuid,
+            VoteRequest voteRequest
+    ) {
+        commentService.vote(
+                authenticatedUser.getUuid(),
+                commentUuid,
+                voteRequest.getDirection()
+        );
     }
 }

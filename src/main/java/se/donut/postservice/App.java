@@ -15,10 +15,7 @@ import org.jdbi.v3.core.Jdbi;
 import se.donut.postservice.auth.UserAuthenticator;
 import se.donut.postservice.auth.UserAuthorizer;
 import se.donut.postservice.auth.AuthenticatedUser;
-import se.donut.postservice.model.mapper.CommentMapper;
-import se.donut.postservice.model.mapper.ForumMapper;
-import se.donut.postservice.model.mapper.PostMapper;
-import se.donut.postservice.model.mapper.UserMapper;
+import se.donut.postservice.model.mapper.*;
 import se.donut.postservice.repository.*;
 import se.donut.postservice.repository.postgresql.*;
 import se.donut.postservice.resource.*;
@@ -44,24 +41,23 @@ public class App extends Application<AppConfig> {
         jdbi.registerRowMapper(new ForumMapper());
         jdbi.registerRowMapper(new PostMapper());
         jdbi.registerRowMapper(new CommentMapper());
+        jdbi.registerRowMapper(new VoteMapper());
 
         VaultAccessor vaultAccessor = new PostgresVaultDAO(jdbi);
-        AuthService authService = new AuthService(vaultAccessor);
-
         UserAccessor userAccessor = new PostgresUserDAO(jdbi);
-        UserService userService = new UserService(userAccessor);
-        UserResource userResource = new UserResource(userService);
-
-        PostAccessor postAccessor = new PostgresPostDAO(jdbi);
-        PostService postService = new PostService(postAccessor);
-        PostResource postResource = new PostResource(postService);
-
-        ForumAccessor forumAccessor = new PostgresForumDAO(jdbi);
-        ForumService forumService = new ForumService(forumAccessor);
-        ForumResource forumResource = new ForumResource(forumService);
-
         CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
+        PostAccessor postAccessor = new PostgresPostDAO(jdbi);
+        ForumAccessor forumAccessor = new PostgresForumDAO(jdbi);
+
+        AuthService authService = new AuthService(vaultAccessor);
+        UserService userService = new UserService(userAccessor);
+        PostService postService = new PostService(postAccessor, commentAccessor);
+        ForumService forumService = new ForumService(forumAccessor);
         CommentService commentService = new CommentService(commentAccessor, postAccessor);
+
+        UserResource userResource = new UserResource(userService);
+        PostResource postResource = new PostResource(postService);
+        ForumResource forumResource = new ForumResource(forumService);
         CommentResource commentResource = new CommentResource(commentService);
 
         environment.jersey().register(new AuthDynamicFeature(

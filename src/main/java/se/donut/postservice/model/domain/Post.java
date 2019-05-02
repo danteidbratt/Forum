@@ -1,8 +1,11 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
+import se.donut.postservice.model.api.CommentDTO;
+import se.donut.postservice.model.api.PostThreadDTO;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -28,5 +31,19 @@ public class Post extends Entry {
         this.forumUuid = forumUuid;
         this.title = title;
         this.link = link;
+    }
+
+    public PostThreadDTO toApiModel(List<CommentDTO> commentTree) {
+        return new PostThreadDTO(
+                this.getUuid(),
+                this.getAuthorUuid(),
+                this.getAuthorName(),
+                this.getTitle(),
+                this.getLink(),
+                this.getContent(),
+                this.getScore(),
+                this.getCreatedAt(),
+                commentTree
+        );
     }
 }

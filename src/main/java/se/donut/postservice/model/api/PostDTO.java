@@ -1,26 +1,22 @@
 package se.donut.postservice.model.api;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
 public class PostDTO {
 
-    private UUID uuid;
-    private UUID authorUuid;
-    private String authorName;
-    private String title;
-    private String link;
-    private String content;
-    private int score;
-    private Instant createdAt;
-    private List<CommentDTO> comments;
+    private final UUID uuid;
+    private final UUID authorUuid;
+    private final String authorName;
+    private final String title;
+    private final String link;
+    private final String content;
+    private final int score;
+    private final Instant createdAt;
 
 }

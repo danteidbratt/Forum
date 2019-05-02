@@ -5,6 +5,7 @@ import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.resource.request.CreateForumRequest;
 import se.donut.postservice.service.ForumService;
 
+import javax.annotation.security.PermitAll;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,6 +25,7 @@ public class ForumResource {
         this.forumService = forumService;
     }
 
+    @PermitAll
     @POST
     public Response createForum(
             @Auth AuthenticatedUser user,
