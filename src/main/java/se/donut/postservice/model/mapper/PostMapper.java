@@ -6,6 +6,7 @@ import se.donut.postservice.model.domain.Post;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
 public class PostMapper implements RowMapper<Post> {
@@ -20,7 +21,7 @@ public class PostMapper implements RowMapper<Post> {
                 UUID.fromString(rs.getString("forum_uuid")),
                 rs.getString("title"),
                 rs.getString("link"),
-                rs.getTimestamp("created_at").toInstant()
+                Date.from(rs.getTimestamp("created_at").toInstant())
         );
     }
 }

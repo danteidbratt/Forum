@@ -17,4 +17,8 @@ public interface CommentAccessor {
 
     void vote(Vote vote);
 
+    void deleteVote(Vote vote);
+
+    Optional<Vote> getVote(UUID userUuid, UUID targetUuid);
+
 }

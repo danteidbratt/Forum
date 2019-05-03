@@ -6,6 +6,7 @@ import se.donut.postservice.model.domain.Subscription;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
 public class SubscriptionMapper implements RowMapper<Subscription> {
@@ -16,7 +17,7 @@ public class SubscriptionMapper implements RowMapper<Subscription> {
                 UUID.fromString(rs.getString("uuid")),
                 UUID.fromString(rs.getString("user_uuid")),
                 UUID.fromString(rs.getString("forum_uuid")),
-                rs.getTimestamp("created_at").toInstant()
+                Date.from(rs.getTimestamp("created_at").toInstant())
         );
     }
 }

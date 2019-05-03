@@ -1,20 +1,22 @@
 package se.donut.postservice.model.api;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import se.donut.postservice.model.domain.Role;
 
+import java.util.Date;
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserDTO {
+@Getter
+public class UserDTO extends AbstractDTO {
 
-    private UUID uuid;
-    private String name;
-    private Integer carma;
-    private Role role;
+    private final String name;
+    private final Integer carma;
+    private final Role role;
 
+    public UserDTO(UUID uuid, Date createdAt, String name, Integer carma, Role role) {
+        super(uuid, createdAt);
+        this.name = name;
+        this.carma = carma;
+        this.role = role;
+    }
 }

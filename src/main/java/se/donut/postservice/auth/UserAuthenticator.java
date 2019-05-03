@@ -4,18 +4,15 @@ import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import se.donut.postservice.model.api.UserDTO;
-import se.donut.postservice.service.AuthService;
 import se.donut.postservice.service.UserService;
 
 import java.util.Optional;
 
 public class UserAuthenticator implements Authenticator<BasicCredentials, AuthenticatedUser> {
 
-    private final AuthService authService;
     private final UserService userService;
 
-    public UserAuthenticator(AuthService authService, UserService userService) {
-        this.authService = authService;
+    public UserAuthenticator(UserService userService) {
         this.userService = userService;
     }
 
@@ -32,6 +29,6 @@ public class UserAuthenticator implements Authenticator<BasicCredentials, Authen
                     user.getRole().toString()
             ));
         }
-        return Optional.empty();
+        return Optional.ofNullable(null);
     }
 }

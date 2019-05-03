@@ -36,17 +36,16 @@ public class ForumResource {
 
     @PermitAll
     @POST
-    public Response createForum(
+    public UUID createForum(
             @Auth AuthenticatedUser user,
             CreateForumRequest request
     ) {
-        UUID uuid = forumService.createForum(
+        return forumService.createForum(
                 user.getUuid(),
                 user.getName(),
                 request.getName(),
                 request.getDescription()
         );
-        return Response.ok(uuid).build();
     }
 
     @PermitAll

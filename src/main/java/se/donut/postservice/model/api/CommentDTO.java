@@ -4,15 +4,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import se.donut.postservice.model.Direction;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(NON_NULL)
 public class CommentDTO {
@@ -22,7 +22,8 @@ public class CommentDTO {
     private String authorName;
     private String content;
     private int score;
-    private Instant createdAt;
+    private Date createdAt;
+    private Direction myVote;
     private List<CommentDTO> children;
 
 }

@@ -2,27 +2,26 @@ package se.donut.postservice.model.api;
 
 import lombok.Getter;
 
-import java.time.Instant;
-import java.util.List;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
-public class PostDTO extends PostPreviewDTO {
+public class PostDTO extends AbstractDTO {
 
-    private final List<CommentDTO> comments;
+    private final UUID authorUuid;
+    private final String authorName;
+    private final String title;
+    private final String link;
+    private final String content;
+    private final int score;
 
-    public PostDTO(
-            UUID uuid,
-            UUID authorUuid,
-            String authorName,
-            String title,
-            String link,
-            String content,
-            int score,
-            Instant createdAt,
-            List<CommentDTO> comments
-    ) {
-        super(uuid, authorUuid, authorName, title, link, content, score, createdAt);
-        this.comments = comments;
+    public PostDTO(UUID uuid, Date createdAt, UUID authorUuid, String authorName, String title, String link, String content, int score) {
+        super(uuid, createdAt);
+        this.authorUuid = authorUuid;
+        this.authorName = authorName;
+        this.title = title;
+        this.link = link;
+        this.content = content;
+        this.score = score;
     }
 }

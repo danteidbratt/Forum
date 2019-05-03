@@ -1,11 +1,9 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
-import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.api.PostDTO;
 
-import java.time.Instant;
-import java.util.List;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -24,7 +22,7 @@ public class Post extends Submission {
             UUID forumUuid,
             String title,
             String link,
-            Instant createdAt
+            Date createdAt
     ) {
         super(uuid, authorUuid, authorName, content, score, createdAt);
         this.forumUuid = forumUuid;
@@ -32,17 +30,16 @@ public class Post extends Submission {
         this.link = link;
     }
 
-    public PostDTO toApiModel(List<CommentDTO> commentTree) {
+    public PostDTO toApiModel() {
         return new PostDTO(
                 this.getUuid(),
+                this.getCreatedAt(),
                 this.getAuthorUuid(),
                 this.getAuthorName(),
                 this.getTitle(),
                 this.getLink(),
                 this.getContent(),
-                this.getScore(),
-                this.getCreatedAt(),
-                commentTree
+                this.getScore()
         );
     }
 }

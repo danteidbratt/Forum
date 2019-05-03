@@ -3,7 +3,7 @@ package se.donut.postservice.model.domain;
 import lombok.Getter;
 import se.donut.postservice.model.api.ForumDTO;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +18,7 @@ public class Forum extends Submission {
             String name,
             String content,
             int score,
-            Instant createdAt
+            Date createdAt
     ) {
         super(uuid, authorUuid, authorName, content, score, createdAt);
         this.name = name;
@@ -27,12 +27,12 @@ public class Forum extends Submission {
     public ForumDTO toApiModel() {
         return new ForumDTO(
                 this.getUuid(),
+                this.getCreatedAt(),
                 this.getAuthorUuid(),
                 this.getAuthorName(),
                 this.getName(),
                 this.getName(),
-                this.getScore(),
-                this.getCreatedAt()
+                this.getScore()
         );
     }
 }

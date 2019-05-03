@@ -1,7 +1,6 @@
 package se.donut.postservice.service;
 
 import se.donut.postservice.exception.PostServiceException;
-import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.model.domain.Forum;
 import se.donut.postservice.model.domain.Post;
@@ -9,9 +8,10 @@ import se.donut.postservice.repository.ForumAccessor;
 import se.donut.postservice.repository.PostAccessor;
 import se.donut.postservice.resource.request.SortType;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
 import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
@@ -19,22 +19,26 @@ import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
 public class PostService {
 
     private final PostAccessor postAccessor;
-    private final CommentService commentService;
     private final ForumAccessor forumAccessor;
 
-    public PostService(PostAccessor postAccessor, ForumAccessor forumAccessor, CommentService commentService) {
+    public PostService(PostAccessor postAccessor, ForumAccessor forumAccessor) {
         this.postAccessor = postAccessor;
         this.forumAccessor = forumAccessor;
-        this.commentService = commentService;
     }
 
-    public PostDTO getPost(UUID postUuid, SortType sortType) {
+    public PostDTO getPost(UUID postUuid) {
         Post post = postAccessor.get(postUuid)
                 .orElseThrow(() -> new PostServiceException(POST_NOT_FOUND));
 
-        List<CommentDTO> commentTree = commentService.getCommentTreeByPost(postUuid, sortType);
+        return post.toApiModel();
+    }
 
-        return post.toApiModel(commentTree);
+    public List<PostDTO> getByForum(UUID forumUuid, SortType sortType) {
+        return postAccessor.getByForum(forumUuid)
+                .stream()
+                .sorted(sortType.getComparator())
+                .map(Post::toApiModel)
+                .collect(Collectors.toList());
     }
 
     public UUID createPost(UUID forumUuid, UUID authorUuid, String authorName, String title, String link, String content) {
@@ -49,7 +53,7 @@ public class PostService {
                 forum.getUuid(),
                 title,
                 link,
-                Instant.now()
+                new Date()
         );
         postAccessor.create(post);
         return postUuid;

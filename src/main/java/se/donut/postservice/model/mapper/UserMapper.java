@@ -2,11 +2,12 @@ package se.donut.postservice.model.mapper;
 
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
-import se.donut.postservice.model.domain.User;
 import se.donut.postservice.model.domain.Role;
+import se.donut.postservice.model.domain.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
 public class UserMapper implements RowMapper<User> {
@@ -17,7 +18,7 @@ public class UserMapper implements RowMapper<User> {
                 rs.getString("name"),
                 rs.getInt("carma"),
                 Role.valueOf(rs.getString("role")),
-                rs.getTimestamp("created_at").toInstant()
+                Date.from(rs.getTimestamp("created_at").toInstant())
         );
     }
 }

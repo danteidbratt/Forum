@@ -7,6 +7,7 @@ import se.donut.postservice.model.domain.Vote;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
 public class VoteMapper implements RowMapper<Vote> {
@@ -14,11 +15,9 @@ public class VoteMapper implements RowMapper<Vote> {
     @Override
     public Vote map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new Vote(
-                UUID.fromString(rs.getString("uuid")),
                 UUID.fromString(rs.getString("target_uuid")),
                 UUID.fromString(rs.getString("user_uuid")),
                 Direction.valueOf(rs.getString("direction")),
-                rs.getTimestamp("created_at").toInstant()
-        );
+                Date.from(rs.getTimestamp("created_at").toInstant()));
     }
 }

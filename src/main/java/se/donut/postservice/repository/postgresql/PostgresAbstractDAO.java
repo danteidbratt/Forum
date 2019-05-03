@@ -10,4 +10,12 @@ public class PostgresAbstractDAO {
         this.jdbi = jdbi;
     }
 
+    public void beginTransaction() {
+        jdbi.open();
+    }
+
+    public void endTransaction() {
+
+    }
+
 }

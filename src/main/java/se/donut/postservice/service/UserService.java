@@ -5,7 +5,7 @@ import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.UserAccessor;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,6 +23,7 @@ public class UserService {
     public UserDTO getUser(UUID userUuid) {
         User user = userAccessor.getUser(userUuid)
                 .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
+
         return user.toApiModel();
     }
 
@@ -35,7 +36,7 @@ public class UserService {
                 username,
                 0,
                 USER,
-                Instant.now()
+                new Date()
         );
         userAccessor.createUser(user, password);
         return userUuid;
@@ -51,16 +52,16 @@ public class UserService {
 
     private void validateNewUser(String username, String password) {
         userAccessor.getUser(username).ifPresent(d -> {
-            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
+            throw new PostServiceException(USERNAME_ALREADY_EXISTS);
         });
 
         if (username.length() < 3) {
             // TODO: fix type
-            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
+            throw new PostServiceException(USERNAME_ALREADY_EXISTS);
         }
         if (password.length() < 3) {
             // TODO: fix type
-            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
+            throw new PostServiceException(USERNAME_ALREADY_EXISTS);
         }
 
     }

@@ -12,9 +12,9 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.jdbi.v3.core.Jdbi;
+import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.auth.UserAuthenticator;
 import se.donut.postservice.auth.UserAuthorizer;
-import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.mapper.*;
 import se.donut.postservice.repository.*;
 import se.donut.postservice.repository.postgresql.*;
@@ -44,18 +44,16 @@ public class App extends Application<AppConfig> {
         jdbi.registerRowMapper(new VoteMapper());
         jdbi.registerRowMapper(new SubscriptionMapper());
 
-        VaultAccessor vaultAccessor = new PostgresVaultDAO(jdbi);
         UserAccessor userAccessor = new PostgresUserDAO(jdbi);
         CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
         PostAccessor postAccessor = new PostgresPostDAO(jdbi);
         ForumAccessor forumAccessor = new PostgresForumDAO(jdbi);
         SubscriptionAccessor subscriptionAccessor = new PostgresSubscriptionDAO(jdbi);
 
-        AuthService authService = new AuthService(vaultAccessor);
         UserService userService = new UserService(userAccessor);
         ForumService forumService = new ForumService(forumAccessor, subscriptionAccessor);
         CommentService commentService = new CommentService(commentAccessor, postAccessor);
-        PostService postService = new PostService(postAccessor, forumAccessor, commentService);
+        PostService postService = new PostService(postAccessor, forumAccessor);
 
         UserResource userResource = new UserResource(userService);
         PostResource postResource = new PostResource(postService);
@@ -64,7 +62,7 @@ public class App extends Application<AppConfig> {
 
         environment.jersey().register(new AuthDynamicFeature(
                 new BasicCredentialAuthFilter.Builder<AuthenticatedUser>()
-                        .setAuthenticator(new UserAuthenticator(authService, userService))
+                        .setAuthenticator(new UserAuthenticator(userService))
                         .setAuthorizer(new UserAuthorizer())
                         .setRealm("SUPER SECRET STUFF")
                         .buildAuthFilter()));

@@ -1,24 +1,20 @@
 package se.donut.postservice.service;
 
+import org.jdbi.v3.sqlobject.transaction.Transaction;
 import se.donut.postservice.exception.PostServiceException;
+import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.domain.Comment;
-import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.domain.Post;
 import se.donut.postservice.model.domain.Vote;
 import se.donut.postservice.repository.CommentAccessor;
 import se.donut.postservice.repository.PostAccessor;
 import se.donut.postservice.resource.request.SortType;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static se.donut.postservice.exception.ExceptionType.COMMENT_NOT_FOUND;
-import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.*;
 
 public class CommentService {
 
@@ -30,6 +26,7 @@ public class CommentService {
         this.postAccessor = postAccessor;
     }
 
+    @Transaction
     public UUID createComment(
             UUID postUuid,
             UUID parentUuid,
@@ -44,30 +41,39 @@ public class CommentService {
                 authorUuid,
                 authorName,
                 content,
-                1,
+                0,
                 parentUuid,
                 postUuid,
-                Instant.now()
+                new Date()
         );
         commentAccessor.createComment(comment);
         return commentUuid;
     }
 
-    List<CommentDTO> getCommentTreeByPost(UUID postUuid, SortType sortType) {
+    public List<CommentDTO> getCommentTreeByPost(UUID postUuid, SortType sortType) {
         List<Comment> comments = commentAccessor.getCommentsByPostUuid(postUuid);
         return buildCommentTree(postUuid, comments, sortType);
     }
 
     public void vote(UUID userUuid, UUID commentUuid, Direction direction) {
+        Optional<Vote> currentVote = commentAccessor.getVote(userUuid, commentUuid);
+        if (currentVote.isPresent()) {
+            throw new PostServiceException(VOTE_ALREADY_EXISTS);
+        }
+
         Vote vote = new Vote(
-                UUID.randomUUID(),
                 commentUuid,
                 userUuid,
                 direction,
-                Instant.now()
-        );
+                new Date());
 
         commentAccessor.vote(vote);
+    }
+
+    public void deleteVote(UUID userUuid, UUID commentUuid) {
+        Vote currentVote = commentAccessor.getVote(userUuid, commentUuid)
+                .orElseThrow(() -> new PostServiceException(VOTE_NOT_FOUND));
+        commentAccessor.deleteVote(currentVote);
     }
 
     private void validateParent(UUID postUuid, UUID parentUuid) {
@@ -99,7 +105,7 @@ public class CommentService {
         }
         List<CommentDTO> result = new ArrayList<>();
         for (Comment comment : commentMap.get(parentUuid)) {
-            result.add(comment.toApiModel(recurse(commentMap, comment.getUuid())));
+            result.add(comment.toApiModel(recurse(commentMap, comment.getUuid()), null));
         }
         return result;
     }

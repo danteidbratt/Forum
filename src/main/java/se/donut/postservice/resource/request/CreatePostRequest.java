@@ -1,6 +1,7 @@
 package se.donut.postservice.resource.request;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter

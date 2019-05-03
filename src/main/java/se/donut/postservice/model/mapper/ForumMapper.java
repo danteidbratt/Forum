@@ -6,6 +6,7 @@ import se.donut.postservice.model.domain.Forum;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
 public class ForumMapper implements RowMapper<Forum> {
@@ -19,7 +20,7 @@ public class ForumMapper implements RowMapper<Forum> {
                 rs.getString("name"),
                 rs.getString("content"),
                 rs.getInt("score"),
-                rs.getTimestamp("created_at").toInstant()
+                Date.from(rs.getTimestamp("created_at").toInstant())
         );
     }
 }

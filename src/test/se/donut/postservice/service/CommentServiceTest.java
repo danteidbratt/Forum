@@ -65,9 +65,9 @@ public class CommentServiceTest {
 
         // Assert
         assertEquals(numberOfComments, commentTree.size());
-        Instant previousInstant = Instant.MAX;
+        Date previousInstant = new Date(Long.MAX_VALUE);
         for (CommentDTO commentDTO : commentTree) {
-            assertTrue(previousInstant.isAfter(commentDTO.getCreatedAt()));
+            assertTrue(previousInstant.after(commentDTO.getCreatedAt()));
             previousInstant = commentDTO.getCreatedAt();
         }
     }
@@ -76,11 +76,12 @@ public class CommentServiceTest {
     public void shouldBeAbleToNestCommentsRecursively() {
         // Arrange
         UUID postUuid = UUID.randomUUID();
-        Comment comment0 = generateComment(postUuid, postUuid, 2);
-        Comment comment00 = generateComment(postUuid, comment0.getUuid(), 2);
-        Comment comment000 = generateComment(postUuid, comment00.getUuid(), 2);
-        Comment comment01 = generateComment(postUuid, comment0.getUuid(), 1);
-        Comment comment1 = generateComment(postUuid, postUuid, 1);
+        Date now = new Date();
+        Comment comment0 = generateComment(postUuid, postUuid, 2, now);
+        Comment comment00 = generateComment(postUuid, comment0.getUuid(), 2, now);
+        Comment comment000 = generateComment(postUuid, comment00.getUuid(), 2, now);
+        Comment comment01 = generateComment(postUuid, comment0.getUuid(), 1, now);
+        Comment comment1 = generateComment(postUuid, postUuid, 1, now);
         List<Comment> comments = Arrays.asList(comment0, comment00, comment000, comment01, comment1);
         when(commentAccessor.getCommentsByPostUuid(postUuid)).thenReturn(comments);
 
@@ -150,18 +151,16 @@ public class CommentServiceTest {
     }
 
     private List<Comment> generateListOfRandomRootComments(int numberOfComments, UUID postUuid) {
-        UUID authorUuid = UUID.randomUUID();
         List<Comment> comments = new ArrayList<>();
         for (int i = 0; i < numberOfComments; i++) {
             int score = (int) (Math.random() * 100);
-            Instant instant = Instant.ofEpochMilli((long) (Math.random() * 100000000));
-            UUID uuid = UUID.randomUUID();
-            comments.add(new Comment(uuid, authorUuid, "name", "content", score, postUuid, postUuid, instant));
+            Date date = Date.from(Instant.ofEpochMilli((long) (Math.random() * 100000000)));
+            comments.add(generateComment(postUuid, postUuid, score, date));
         }
         return comments;
     }
 
-    private Comment generateComment(UUID postUuid, UUID parentUuid, int score) {
+    private Comment generateComment(UUID postUuid, UUID parentUuid, int score, Date date) {
         return new Comment(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
@@ -170,7 +169,7 @@ public class CommentServiceTest {
                 score,
                 parentUuid,
                 postUuid,
-                Instant.now()
+                date
         );
     }
 

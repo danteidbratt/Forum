@@ -3,14 +3,15 @@ package se.donut.postservice.resource;
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.PostDTO;
-import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.resource.request.CreatePostRequest;
+import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.service.PostService;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.UUID;
 
 @Path("forums/{forumUuid}/posts")
@@ -42,12 +43,19 @@ public class PostResource {
         return Response.ok(uuid).build();
     }
 
+    @GET
+    public List<PostDTO> getPostsByForum(
+            @PathParam("forumUuid") UUID forumUuid,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getByForum(forumUuid, sortType);
+    }
+
     @Path("{postUuid}")
     @GET
     public PostDTO getPost(
-            @PathParam("postUuid") UUID postUuid,
-            @DefaultValue("TOP") @QueryParam("sort") SortType sortType) {
-        return postService.getPost(postUuid, sortType);
+            @PathParam("postUuid") UUID postUuid) {
+        return postService.getPost(postUuid);
     }
 
 }

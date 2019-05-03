@@ -1,21 +1,34 @@
 package se.donut.postservice.model.api;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
-public class ForumDTO {
+public class ForumDTO extends AbstractDTO {
 
-    private final UUID uuid;
     private final UUID authorUuid;
     private final String authorName;
     private final String name;
     private final String description;
     private final int subscribers;
-    private final Instant createdAt;
 
+
+    public ForumDTO(
+            UUID uuid,
+            Date createdAt,
+            UUID authorUuid,
+            String authorName,
+            String name,
+            String description,
+            int subscribers
+    ) {
+        super(uuid, createdAt);
+        this.authorUuid = authorUuid;
+        this.authorName = authorName;
+        this.name = name;
+        this.description = description;
+        this.subscribers = subscribers;
+    }
 }

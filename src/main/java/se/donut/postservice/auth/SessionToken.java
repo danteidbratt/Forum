@@ -1,8 +1,6 @@
 package se.donut.postservice.auth;
 
 
-import java.util.UUID;
-
 public class SessionToken {
 
     private final String key;

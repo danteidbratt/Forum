@@ -12,7 +12,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
-import static se.donut.postservice.exception.ExceptionType.USERNAME_ALREADY_TAKEN;
+import static se.donut.postservice.exception.ExceptionType.USERNAME_ALREADY_EXISTS;
 import static se.donut.postservice.model.domain.Role.USER;
 
 
@@ -41,7 +41,7 @@ public class UserServiceTest {
             fail();
         } catch (PostServiceException e) {
             // Assert
-            assertEquals(USERNAME_ALREADY_TAKEN, e.getExceptionType());
+            assertEquals(USERNAME_ALREADY_EXISTS, e.getExceptionType());
         }
     }
 

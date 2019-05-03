@@ -6,6 +6,7 @@ import se.donut.postservice.model.domain.Comment;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.UUID;
 
 public class CommentMapper implements RowMapper<Comment> {
@@ -20,7 +21,7 @@ public class CommentMapper implements RowMapper<Comment> {
                 rs.getInt("score"),
                 UUID.fromString(rs.getString("parent_uuid")),
                 UUID.fromString(rs.getString("post_uuid")),
-                rs.getTimestamp("created_at").toInstant()
+                Date.from(rs.getTimestamp("created_at").toInstant())
         );
     }
 }

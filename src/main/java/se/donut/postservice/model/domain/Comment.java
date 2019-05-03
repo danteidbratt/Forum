@@ -1,9 +1,10 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
+import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.CommentDTO;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,14 +22,14 @@ public class Comment extends Submission {
             int score,
             UUID parentUuid,
             UUID postUuid,
-            Instant createdAt
+            Date createdAt
     ) {
         super(uuid, authorUuid, authorName, content, score, createdAt);
         this.parentUuid = parentUuid;
         this.postUuid = postUuid;
     }
 
-    public CommentDTO toApiModel(List<CommentDTO> children) {
+    public CommentDTO toApiModel(List<CommentDTO> children, Direction myVote) {
         return new CommentDTO(
                 this.getUuid(),
                 this.getAuthorUuid(),
@@ -36,6 +37,7 @@ public class Comment extends Submission {
                 this.getContent(),
                 this.getScore(),
                 this.getCreatedAt(),
+                myVote,
                 children
         );
     }

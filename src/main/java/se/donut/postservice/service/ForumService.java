@@ -9,7 +9,7 @@ import se.donut.postservice.repository.ForumAccessor;
 import se.donut.postservice.repository.SubscriptionAccessor;
 import se.donut.postservice.resource.request.SortType;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,7 +42,7 @@ public class ForumService {
 
     public UUID createForum(UUID userUuid, String username, String name, String description) {
         UUID forumUuid = UUID.randomUUID();
-        Instant now = Instant.now();
+        Date now = new Date();
         Forum forum = new Forum(
                 forumUuid,
                 userUuid,
@@ -77,7 +77,7 @@ public class ForumService {
                 subscriptionUuid,
                 userUuid,
                 forumUuid,
-                Instant.now()
+                new Date()
         );
 
         subscriptionAccessor.create(subscription);

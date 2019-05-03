@@ -2,7 +2,7 @@ package se.donut.postservice.model.domain;
 
 import lombok.Getter;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -19,7 +19,7 @@ public abstract class Submission extends AbstractEntity {
             String authorName,
             String content,
             int score,
-            Instant createdAt
+            Date createdAt
     ) {
         super(uuid, createdAt);
         this.authorUuid = authorUuid;

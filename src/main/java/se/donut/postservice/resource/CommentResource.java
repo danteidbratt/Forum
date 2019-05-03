@@ -2,7 +2,9 @@ package se.donut.postservice.resource;
 
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
+import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.resource.request.CreateCommentRequest;
+import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.resource.request.VoteRequest;
 import se.donut.postservice.service.CommentService;
 
@@ -10,6 +12,7 @@ import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.UUID;
 
 @Produces(MediaType.APPLICATION_JSON)
@@ -42,6 +45,16 @@ public class CommentResource {
     }
 
     @PermitAll
+    @GET
+    public List<CommentDTO> getCommentsByPost(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("postUuid") UUID postUuid,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getCommentTreeByPost(postUuid, sortType);
+    }
+
+    @PermitAll
     @Path("{commentUuid}")
     @POST
     public Response commentOnComment(
@@ -51,7 +64,7 @@ public class CommentResource {
             @PathParam("commentUuid") UUID commentUuid,
             CreateCommentRequest request
     ) {
-        // TODO: Verify that parent comment is tied to the correct post
+        // TODO: Verify that parent comment is tied to the correct post?
 
         UUID uuid = commentService.createComment(
                 postUuid,
@@ -76,5 +89,16 @@ public class CommentResource {
                 commentUuid,
                 voteRequest.getDirection()
         );
+    }
+
+    @PermitAll
+    @Path("{commentUuid}/vote")
+    @DELETE
+    public void deleteVoteOnComment(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("commentUuid") UUID commentUuid,
+            VoteRequest voteRequest
+    ) {
+        commentService.deleteVote(authenticatedUser.getUuid(), commentUuid);
     }
 }

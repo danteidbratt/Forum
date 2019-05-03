@@ -18,15 +18,13 @@ public class PostServiceTest {
 
     private PostAccessor postAccessor;
     private ForumAccessor forumAccessor;
-    private CommentService commentService;
     private PostService postService;
 
     @Before
     public void setup() {
         postAccessor = mock(PostAccessor.class);
         forumAccessor = mock(ForumAccessor.class);
-        commentService = mock(CommentService.class);
-        postService = new PostService(postAccessor, forumAccessor, commentService);
+        postService = new PostService(postAccessor, forumAccessor);
     }
 
     @Test
