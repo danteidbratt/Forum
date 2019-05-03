@@ -17,11 +17,10 @@ public class PostMapper implements RowMapper<Post> {
                 rs.getString("author_name"),
                 rs.getString("content"),
                 rs.getInt("score"),
-                rs.getTimestamp("created_at").toInstant(),
-                rs.getBoolean("is_deleted"),
                 UUID.fromString(rs.getString("forum_uuid")),
                 rs.getString("title"),
-                rs.getString("link")
+                rs.getString("link"),
+                rs.getTimestamp("created_at").toInstant()
         );
     }
 }

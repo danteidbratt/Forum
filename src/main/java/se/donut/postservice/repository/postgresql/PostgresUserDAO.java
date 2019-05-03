@@ -33,7 +33,7 @@ public class PostgresUserDAO extends PostgresAbstractDAO implements UserAccessor
             handle.createUpdate("INSERT INTO users " +
                     "(uuid, name, role, created_at, carma, is_deleted) " +
                     "VALUES " +
-                    "(:uuid, :name, :role, :createdAt, :carma, :isDeleted)")
+                    "(:uuid, :name, :role, :createdAt, :carma, false)")
                     .bindBean(user)
                     .execute();
             handle.createUpdate("INSERT INTO vault (user_uuid, password) values (:userUuid, :password)")

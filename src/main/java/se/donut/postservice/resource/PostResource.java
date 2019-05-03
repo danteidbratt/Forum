@@ -2,8 +2,8 @@ package se.donut.postservice.resource;
 
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
-import se.donut.postservice.model.api.PostThreadDTO;
-import se.donut.postservice.resource.request.CommentSortType;
+import se.donut.postservice.model.api.PostDTO;
+import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.resource.request.CreatePostRequest;
 import se.donut.postservice.service.PostService;
 
@@ -44,10 +44,10 @@ public class PostResource {
 
     @Path("{postUuid}")
     @GET
-    public PostThreadDTO getPost(
+    public PostDTO getPost(
             @PathParam("postUuid") UUID postUuid,
-            @DefaultValue("TOP") @QueryParam("sort") CommentSortType commentSortType) {
-        return postService.getPost(postUuid, commentSortType);
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType) {
+        return postService.getPost(postUuid, sortType);
     }
 
 }

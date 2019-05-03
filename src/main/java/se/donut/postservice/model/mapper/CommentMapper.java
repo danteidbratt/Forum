@@ -18,10 +18,9 @@ public class CommentMapper implements RowMapper<Comment> {
                 rs.getString("author_name"),
                 rs.getString("content"),
                 rs.getInt("score"),
-                rs.getTimestamp("created_at").toInstant(),
-                rs.getBoolean("is_deleted"),
                 UUID.fromString(rs.getString("parent_uuid")),
-                UUID.fromString(rs.getString("post_uuid"))
+                UUID.fromString(rs.getString("post_uuid")),
+                rs.getTimestamp("created_at").toInstant()
         );
     }
 }

@@ -42,18 +42,20 @@ public class App extends Application<AppConfig> {
         jdbi.registerRowMapper(new PostMapper());
         jdbi.registerRowMapper(new CommentMapper());
         jdbi.registerRowMapper(new VoteMapper());
+        jdbi.registerRowMapper(new SubscriptionMapper());
 
         VaultAccessor vaultAccessor = new PostgresVaultDAO(jdbi);
         UserAccessor userAccessor = new PostgresUserDAO(jdbi);
         CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
         PostAccessor postAccessor = new PostgresPostDAO(jdbi);
         ForumAccessor forumAccessor = new PostgresForumDAO(jdbi);
+        SubscriptionAccessor subscriptionAccessor = new PostgresSubscriptionDAO(jdbi);
 
         AuthService authService = new AuthService(vaultAccessor);
         UserService userService = new UserService(userAccessor);
-        PostService postService = new PostService(postAccessor, commentAccessor);
-        ForumService forumService = new ForumService(forumAccessor);
+        ForumService forumService = new ForumService(forumAccessor, subscriptionAccessor);
         CommentService commentService = new CommentService(commentAccessor, postAccessor);
+        PostService postService = new PostService(postAccessor, forumAccessor, commentService);
 
         UserResource userResource = new UserResource(userService);
         PostResource postResource = new PostResource(postService);

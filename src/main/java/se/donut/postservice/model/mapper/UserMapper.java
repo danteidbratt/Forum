@@ -17,8 +17,7 @@ public class UserMapper implements RowMapper<User> {
                 rs.getString("name"),
                 rs.getInt("carma"),
                 Role.valueOf(rs.getString("role")),
-                rs.getTimestamp("created_at").toInstant(),
-                rs.getBoolean("is_deleted")
+                rs.getTimestamp("created_at").toInstant()
         );
     }
 }

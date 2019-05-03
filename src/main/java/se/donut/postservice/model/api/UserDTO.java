@@ -11,8 +11,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
+
     private UUID uuid;
     private String name;
     private Integer carma;
     private Role role;
+
 }

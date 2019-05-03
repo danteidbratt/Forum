@@ -10,6 +10,5 @@ public class AbstractEntity {
 
     private final UUID uuid;
     private final Instant createdAt;
-    private final Boolean isDeleted;
 
 }

@@ -1,19 +1,28 @@
 package se.donut.postservice.model.domain;
 
-import lombok.Data;
+import lombok.Getter;
 import se.donut.postservice.model.Direction;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Data
-public class Vote {
+@Getter
+public class Vote extends AbstractEntity {
 
-    private final UUID uuid;
     private final UUID targetUuid;
     private final UUID userUuid;
     private final Direction direction;
-    private final Instant createdAt;
-    private final Boolean isDeleted;
 
+    public Vote(
+            UUID uuid,
+            UUID targetUuid,
+            UUID userUuid,
+            Direction direction,
+            Instant createdAt
+    ) {
+        super(uuid, createdAt);
+        this.targetUuid = targetUuid;
+        this.userUuid = userUuid;
+        this.direction = direction;
+    }
 }

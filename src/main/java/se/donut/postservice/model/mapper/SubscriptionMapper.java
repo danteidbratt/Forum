@@ -2,22 +2,20 @@ package se.donut.postservice.model.mapper;
 
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
-import se.donut.postservice.model.Direction;
-import se.donut.postservice.model.domain.Vote;
+import se.donut.postservice.model.domain.Subscription;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class VoteMapper implements RowMapper<Vote> {
+public class SubscriptionMapper implements RowMapper<Subscription> {
 
     @Override
-    public Vote map(ResultSet rs, StatementContext ctx) throws SQLException {
-        return new Vote(
+    public Subscription map(ResultSet rs, StatementContext ctx) throws SQLException {
+        return new Subscription(
                 UUID.fromString(rs.getString("uuid")),
-                UUID.fromString(rs.getString("target_uuid")),
                 UUID.fromString(rs.getString("user_uuid")),
-                Direction.valueOf(rs.getString("direction")),
+                UUID.fromString(rs.getString("forum_uuid")),
                 rs.getTimestamp("created_at").toInstant()
         );
     }

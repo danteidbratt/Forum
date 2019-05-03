@@ -2,8 +2,11 @@ package se.donut.postservice.repository;
 
 import se.donut.postservice.model.domain.Forum;
 
-public interface ForumAccessor {
+import java.util.List;
 
-    void createForum(Forum forum);
+
+public interface ForumAccessor extends EntityAccessor<Forum> {
+
+    List<Forum> get();
 
 }

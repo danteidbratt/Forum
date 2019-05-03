@@ -14,14 +14,6 @@ import static se.donut.postservice.model.Direction.*;
 
 public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAccessor {
 
-    private static final String INSERT_ROOT_COMMENT = "INSERT INTO comment " +
-            "(uuid, author_uuid, author_name, content, score, created_at, is_deleted, post_uuid) VALUES " +
-            "(:uuid, :authorUuid, :authorName, :content, :score, :createdAt, :isDeleted, :postUuid)";
-
-    private static final String INSERT_NESTED_COMMENT = "INSERT INTO comment " +
-            "(uuid, author_uuid, author_name, content, score, created_at, is_deleted, parent_uuid, post_uuid) VALUES " +
-            "(:uuid, :authorUuid, :authorName, :content, :score, :createdAt, :isDeleted, :parentUuid, :postUuid)";
-
     public PostgresCommentDAO(Jdbi jdbi) {
         super(jdbi);
     }
@@ -39,15 +31,17 @@ public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAc
     public List<Comment> getCommentsByPostUuid(UUID postUuid) {
         return jdbi.withHandle(handle ->
                 handle.createQuery(
-                        "SELECT * FROM comment WHERE post_uuid = :postUuid"
+                        "SELECT * FROM comment WHERE post_uuid = :postUuid AND is_deleted = false"
                 ).bind("postUuid", postUuid).mapTo(Comment.class).list()
         );
     }
 
     public void createComment(Comment comment) {
         jdbi.useHandle(handle ->
-                handle.createUpdate(
-                        comment.getParentUuid() == null ? INSERT_ROOT_COMMENT : INSERT_NESTED_COMMENT
+                handle.createUpdate("INSERT INTO comment " +
+                        "(uuid, author_uuid, author_name, content, score, parent_uuid, post_uuid, created_at, is_deleted) " +
+                        "VALUES " +
+                        "(:uuid, :authorUuid, :authorName, :content, :score, :parentUuid, :postUuid, :createdAt, false)"
                 ).bindBean(comment).execute()
         );
     }
@@ -57,7 +51,7 @@ public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAc
                     handle.createUpdate("INSERT INTO comment_vote " +
                             "(uuid, target_uuid, user_uuid, direction, created_at, is_deleted) " +
                             "VALUES " +
-                            "(:uuid, :targetUuid, :userUuid, :direction, :createdAt, :isDeleted)"
+                            "(:uuid, :targetUuid, :userUuid, :direction, :createdAt, false)"
                     ).bindBean(vote).execute();
                     handle.createUpdate("UPDATE comment SET score = score + :direction where uuid = :targetUuid")
                             .bind("direction", vote.getDirection().equals(UP) ? 1 : -1)

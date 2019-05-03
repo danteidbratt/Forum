@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static se.donut.postservice.exception.ExceptionType.*;
-import static se.donut.postservice.model.domain.Role.MEMBER;
+import static se.donut.postservice.model.domain.Role.USER;
 
 public class UserService {
 
@@ -34,9 +34,8 @@ public class UserService {
                 userUuid,
                 username,
                 0,
-                MEMBER,
-                Instant.now(),
-                false
+                USER,
+                Instant.now()
         );
         userAccessor.createUser(user, password);
         return userUuid;
@@ -52,16 +51,16 @@ public class UserService {
 
     private void validateNewUser(String username, String password) {
         userAccessor.getUser(username).ifPresent(d -> {
-            throw new PostServiceException(NAME_ALREADY_TAKEN);
+            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
         });
 
         if (username.length() < 3) {
             // TODO: fix type
-            throw new PostServiceException(NAME_ALREADY_TAKEN);
+            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
         }
         if (password.length() < 3) {
             // TODO: fix type
-            throw new PostServiceException(NAME_ALREADY_TAKEN);
+            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
         }
 
     }

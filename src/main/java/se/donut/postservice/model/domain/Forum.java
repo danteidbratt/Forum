@@ -1,18 +1,38 @@
 package se.donut.postservice.model.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import se.donut.postservice.model.api.ForumDTO;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Data
-public class Forum {
+@Getter
+public class Forum extends Submission {
 
-    private final UUID uuid;
-    private final UUID createdBy;
     private final String name;
-    private final String description;
-    private final Instant createdAt;
-    private final Boolean isDeleted;
 
+    public Forum(
+            UUID uuid,
+            UUID authorUuid,
+            String authorName,
+            String name,
+            String content,
+            int score,
+            Instant createdAt
+    ) {
+        super(uuid, authorUuid, authorName, content, score, createdAt);
+        this.name = name;
+    }
+
+    public ForumDTO toApiModel() {
+        return new ForumDTO(
+                this.getUuid(),
+                this.getAuthorUuid(),
+                this.getAuthorName(),
+                this.getName(),
+                this.getName(),
+                this.getScore(),
+                this.getCreatedAt()
+        );
+    }
 }

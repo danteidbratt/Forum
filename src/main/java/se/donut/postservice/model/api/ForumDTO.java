@@ -1,21 +1,21 @@
-package se.donut.postservice.model.domain;
+package se.donut.postservice.model.api;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Data
+@Getter
 @AllArgsConstructor
-public abstract class Entry {
+public class ForumDTO {
 
     private final UUID uuid;
     private final UUID authorUuid;
     private final String authorName;
-    private final String content;
-    private final int score;
+    private final String name;
+    private final String description;
+    private final int subscribers;
     private final Instant createdAt;
-    private final Boolean isDeleted;
 
 }

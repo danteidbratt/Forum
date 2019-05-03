@@ -2,14 +2,14 @@ package se.donut.postservice.model.domain;
 
 import lombok.Getter;
 import se.donut.postservice.model.api.CommentDTO;
-import se.donut.postservice.model.api.PostThreadDTO;
+import se.donut.postservice.model.api.PostDTO;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Post extends Entry {
+public class Post extends Submission {
 
     private final UUID forumUuid;
     private final String title;
@@ -21,20 +21,19 @@ public class Post extends Entry {
             String authorName,
             String content,
             int score,
-            Instant createdAt,
-            Boolean isDeleted,
             UUID forumUuid,
             String title,
-            String link
+            String link,
+            Instant createdAt
     ) {
-        super(uuid, authorUuid, authorName, content, score, createdAt, isDeleted);
+        super(uuid, authorUuid, authorName, content, score, createdAt);
         this.forumUuid = forumUuid;
         this.title = title;
         this.link = link;
     }
 
-    public PostThreadDTO toApiModel(List<CommentDTO> commentTree) {
-        return new PostThreadDTO(
+    public PostDTO toApiModel(List<CommentDTO> commentTree) {
+        return new PostDTO(
                 this.getUuid(),
                 this.getAuthorUuid(),
                 this.getAuthorName(),

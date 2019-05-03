@@ -12,8 +12,8 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
-import static se.donut.postservice.exception.ExceptionType.NAME_ALREADY_TAKEN;
-import static se.donut.postservice.model.domain.Role.MEMBER;
+import static se.donut.postservice.exception.ExceptionType.USERNAME_ALREADY_TAKEN;
+import static se.donut.postservice.model.domain.Role.USER;
 
 
 public class UserServiceTest {
@@ -41,12 +41,12 @@ public class UserServiceTest {
             fail();
         } catch (PostServiceException e) {
             // Assert
-            assertEquals(NAME_ALREADY_TAKEN, e.getExceptionType());
+            assertEquals(USERNAME_ALREADY_TAKEN, e.getExceptionType());
         }
     }
 
     @Test
-    public void shouldBeAbleToCreatePoster() {
+    public void shouldBeAbleToCreateUser() {
         // Arrange
         String name = "some username";
         String password = "secret";
@@ -57,11 +57,10 @@ public class UserServiceTest {
 
         // Assert
         ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userAccessor, times(1)).createUser(argumentCaptor.capture(), password);
+        verify(userAccessor, times(1)).createUser(argumentCaptor.capture(), eq(password));
         User user = argumentCaptor.getValue();
         assertEquals("some username", user.getName());
         assertEquals(Integer.valueOf(0), user.getCarma());
-        assertEquals(false, user.getIsDeleted());
-        assertEquals(MEMBER, user.getRole());
+        assertEquals(USER, user.getRole());
     }
 }

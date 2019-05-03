@@ -14,11 +14,12 @@ public class ForumMapper implements RowMapper<Forum> {
     public Forum map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new Forum(
                 UUID.fromString(rs.getString("uuid")),
-                UUID.fromString(rs.getString("created_by")),
+                UUID.fromString(rs.getString("author_uuid")),
+                rs.getString("author_name"),
                 rs.getString("name"),
-                rs.getString("description"),
-                rs.getTimestamp("created_at").toInstant(),
-                rs.getBoolean("is_deleted")
+                rs.getString("content"),
+                rs.getInt("score"),
+                rs.getTimestamp("created_at").toInstant()
         );
     }
 }
