@@ -54,4 +54,20 @@ public class PostgresForumDAO extends PostgresAbstractDAO implements ForumAccess
                         .mapTo(Forum.class).list()
         );
     }
+
+    @Override
+    public List<Forum> getByUser(UUID userUuid) {
+        return jdbi.withHandle(handle ->
+                handle.createQuery("SELECT f.*, u.name AS author_name FROM forum f " +
+                        "INNER JOIN subscription s ON s.forum_uuid = f.uuid " +
+                        "INNER JOIN users u ON u.uuid = f.author_uuid " +
+                        "WHERE " +
+                        "s.user_uuid = :userUuid AND " +
+                        "s.is_deleted = false AND " +
+                        "f.is_deleted = false")
+                        .bind("userUuid", userUuid)
+                        .mapTo(Forum.class)
+                        .list()
+        );
+    }
 }

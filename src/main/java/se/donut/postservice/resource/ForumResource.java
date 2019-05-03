@@ -51,6 +51,13 @@ public class ForumResource {
 
     @PermitAll
     @Path("{forumUuid}/subscriptions")
+    @GET
+    public List<ForumDTO> getSubscriptions(@Auth AuthenticatedUser authenticatedUser) {
+        return forumService.getSubscriptions(authenticatedUser.getUuid());
+    }
+
+    @PermitAll
+    @Path("{forumUuid}/subscriptions")
     @POST
     public UUID subscribe(
             @Auth AuthenticatedUser authenticatedUser,

@@ -33,6 +33,13 @@ public class ForumService {
                 .collect(Collectors.toList());
     }
 
+    public List<ForumDTO> getSubscriptions(UUID userUuid) {
+        return forumAccessor.getByUser(userUuid)
+                .stream()
+                .map(Forum::toApiModel)
+                .collect(Collectors.toList());
+    }
+
     public UUID createForum(UUID userUuid, String username, String name, String description) {
         UUID forumUuid = UUID.randomUUID();
         Instant now = Instant.now();

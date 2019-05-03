@@ -17,8 +17,10 @@ public class PostgresSubscriptionDAO extends PostgresAbstractDAO implements Subs
     public Optional<Subscription> get(UUID uuid) {
         return jdbi.withHandle(handle ->
                 handle.createQuery(
-                        "SELECT * FROM subscription WHERE uuid = :uuid AND is_deleted = false"
-                ).bind("uuid", uuid).mapTo(Subscription.class).findFirst()
+                        "SELECT * FROM subscription WHERE uuid = :uuid AND is_deleted = false")
+                        .bind("uuid", uuid)
+                        .mapTo(Subscription.class)
+                        .findFirst()
         );
     }
 
@@ -28,11 +30,13 @@ public class PostgresSubscriptionDAO extends PostgresAbstractDAO implements Subs
                     handle.createUpdate("INSERT INTO subscription " +
                             "(uuid, user_uuid, forum_uuid, created_at, is_deleted) " +
                             "VALUES " +
-                            "(:uuid, :userUuid, :forumUuid, :createdAt, false)"
-                    ).bindBean(subscription).execute();
+                            "(:uuid, :userUuid, :forumUuid, :createdAt, false)")
+                            .bindBean(subscription)
+                            .execute();
                     handle.createUpdate(
-                            "UPDATE forum SET score = score + 1 WHERE uuid = :uuid"
-                    ).bind("uuid", subscription.getForumUuid()).execute();
+                            "UPDATE forum SET score = score + 1 WHERE uuid = :uuid")
+                            .bind("uuid", subscription.getForumUuid())
+                            .execute();
                 }
         );
     }
@@ -41,11 +45,11 @@ public class PostgresSubscriptionDAO extends PostgresAbstractDAO implements Subs
     public void delete(Subscription subscription) {
         jdbi.useTransaction(handle -> {
                     handle.createUpdate(
-                            "UPDATE subscription SET is_deleted = true WHERE uuid = :uuid"
-                    ).bind("uuid", subscription.getUuid()).execute();
+                            "UPDATE subscription SET is_deleted = true WHERE uuid = :uuid")
+                            .bind("uuid", subscription.getUuid()).execute();
                     handle.createUpdate(
-                            "UPDATE forum SET subscribers = subscribers + 1 WHERE uuid = :uuid"
-                    ).bind("uuid", subscription.getForumUuid());
+                            "UPDATE forum SET subscribers = subscribers + 1 WHERE uuid = :uuid")
+                            .bind("uuid", subscription.getForumUuid());
                 }
         );
     }
