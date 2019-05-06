@@ -53,9 +53,9 @@ public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAc
     public void vote(Vote vote) {
         jdbi.useTransaction(handle -> {
                     handle.createUpdate("INSERT INTO comment_vote " +
-                            "(target_uuid, user_uuid, direction, created_at) " +
+                            "(target_uuid, user_uuid, direction) " +
                             "VALUES " +
-                            "(:targetUuid, :userUuid, :direction, :createdAt)")
+                            "(:targetUuid, :userUuid, :direction)")
                             .bindBean(vote)
                             .execute();
                     handle.createUpdate("UPDATE comment " +

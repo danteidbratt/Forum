@@ -1,9 +1,7 @@
 package se.donut.postservice.model.api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import se.donut.postservice.model.Direction;
 
 import java.util.Date;
@@ -12,8 +10,8 @@ import java.util.UUID;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @JsonInclude(NON_NULL)
 public class CommentDTO {
 
@@ -26,4 +24,21 @@ public class CommentDTO {
     private Direction myVote;
     private List<CommentDTO> children;
 
+    public CommentDTO(
+            UUID uuid,
+            UUID authorUuid,
+            String authorName,
+            String content,
+            int score,
+            Date createdAt,
+            Direction myVote
+    ) {
+        this.uuid = uuid;
+        this.authorUuid = authorUuid;
+        this.authorName = authorName;
+        this.content = content;
+        this.score = score;
+        this.createdAt = createdAt;
+        this.myVote = myVote;
+    }
 }

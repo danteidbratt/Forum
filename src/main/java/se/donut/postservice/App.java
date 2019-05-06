@@ -46,14 +46,16 @@ public class App extends Application<AppConfig> {
 
         CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
         PostAccessor postAccessor = new PostgresPostDAO(jdbi);
+        CommentDAO commentDAO = jdbi.onDemand(CommentDAO.class);
+        PostDAO postDAO = jdbi.onDemand(PostDAO.class);
         UserDAO userDAO = jdbi.onDemand(UserDAO.class);
         ForumDAO forumDAO = jdbi.onDemand(ForumDAO.class);
         SubscriptionDAO subscriptionDAO = jdbi.onDemand(SubscriptionDAO.class);
 
         UserService userService = new UserService(userDAO);
         ForumService forumService = new ForumService(userDAO, forumDAO, subscriptionDAO);
-        CommentService commentService = new CommentService(commentAccessor, postAccessor);
-        PostService postService = new PostService(userDAO, postAccessor, forumDAO);
+        CommentService commentService = new CommentService(commentDAO, postDAO, userDAO);
+        PostService postService = new PostService(userDAO, postDAO, forumDAO);
 
         UserResource userResource = new UserResource(userService);
         PostResource postResource = new PostResource(postService);

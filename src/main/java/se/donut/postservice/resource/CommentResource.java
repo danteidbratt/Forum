@@ -43,6 +43,15 @@ public class CommentResource {
         return Response.ok(uuid).build();
     }
 
+    @Path("guest")
+    @GET
+    public List<CommentDTO> getCommentsByPostAsGuest(
+            @PathParam("postUuid") UUID postUuid,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getCommentTreeByPost(UUID.randomUUID(), postUuid, sortType);
+    }
+
     @PermitAll
     @GET
     public List<CommentDTO> getCommentsByPost(
@@ -50,7 +59,7 @@ public class CommentResource {
             @PathParam("postUuid") UUID postUuid,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return commentService.getCommentTreeByPost(postUuid, sortType);
+        return commentService.getCommentTreeByPost(authenticatedUser.getUuid(), postUuid, sortType);
     }
 
     @PermitAll
@@ -79,11 +88,13 @@ public class CommentResource {
     @POST
     public void voteOnComment(
             @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("postUuid") UUID postUuid,
             @PathParam("commentUuid") UUID commentUuid,
             VoteRequest voteRequest
     ) {
         commentService.vote(
                 authenticatedUser.getUuid(),
+                postUuid,
                 commentUuid,
                 voteRequest.getDirection()
         );

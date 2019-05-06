@@ -1,6 +1,7 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
+import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
 
 import java.util.Date;
@@ -30,10 +31,14 @@ public class Post extends Submission {
     }
 
     public PostDTO toApiModel() {
-        return toApiModel(null);
+        return toApiModel(null, null);
     }
 
     public PostDTO toApiModel(String authorName) {
+        return toApiModel(authorName, null);
+    }
+
+    public PostDTO toApiModel(String authorName, Direction direction) {
         return new PostDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
@@ -42,7 +47,8 @@ public class Post extends Submission {
                 this.getTitle(),
                 this.getLink(),
                 this.getContent(),
-                this.getScore()
+                this.getScore(),
+                direction
         );
     }
 }

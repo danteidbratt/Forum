@@ -15,7 +15,6 @@ public class ForumDTO extends AbstractDTO {
     private final int subscribers;
     private final Boolean subscribed;
 
-
     public ForumDTO(
             UUID uuid,
             Date createdAt,

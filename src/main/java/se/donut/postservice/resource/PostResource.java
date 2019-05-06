@@ -5,6 +5,7 @@ import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.resource.request.CreatePostRequest;
 import se.donut.postservice.resource.request.SortType;
+import se.donut.postservice.resource.request.VoteRequest;
 import se.donut.postservice.service.PostService;
 
 import javax.annotation.security.PermitAll;
@@ -43,12 +44,23 @@ public class PostResource {
         return Response.ok(uuid).build();
     }
 
+    @Path("guest")
     @GET
-    public List<PostDTO> getPostsByForum(
+    public List<PostDTO> getPostsByForumAsGuest(
             @PathParam("forumUuid") UUID forumUuid,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
         return postService.getByForum(forumUuid, sortType);
+    }
+
+    @PermitAll
+    @GET
+    public List<PostDTO> getPostsByForum(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("forumUuid") UUID forumUuid,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getByForum(authenticatedUser.getUuid(), forumUuid, sortType);
     }
 
     @Path("{postUuid}")
@@ -56,6 +68,30 @@ public class PostResource {
     public PostDTO getPost(
             @PathParam("postUuid") UUID postUuid) {
         return postService.getPost(postUuid);
+    }
+
+    @PermitAll
+    @Path("{postUuid}/vote")
+    @POST
+    public Response deleteVoteOnPost(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("forumUuid") UUID forumUuid,
+            @PathParam("postUuid") UUID postUuid,
+            VoteRequest voteRequest
+    ) {
+        postService.vote(forumUuid, postUuid, authenticatedUser.getUuid(), voteRequest.getDirection());
+        return Response.ok().build();
+    }
+
+    @PermitAll
+    @Path("{postUuid}/vote")
+    @DELETE
+    public Response deleteVoteOnPost(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("postUuid") UUID postUuid
+    ) {
+        postService.deleteVote(authenticatedUser.getUuid(), postUuid);
+        return Response.ok().build();
     }
 
 }

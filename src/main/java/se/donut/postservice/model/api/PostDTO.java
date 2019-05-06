@@ -1,6 +1,7 @@
 package se.donut.postservice.model.api;
 
 import lombok.Getter;
+import se.donut.postservice.model.Direction;
 
 import java.util.Date;
 import java.util.UUID;
@@ -14,8 +15,18 @@ public class PostDTO extends AbstractDTO {
     private final String link;
     private final String content;
     private final int score;
+    private final Direction myVote;
 
-    public PostDTO(UUID uuid, Date createdAt, UUID authorUuid, String authorName, String title, String link, String content, int score) {
+    public PostDTO(
+            UUID uuid,
+            Date createdAt,
+            UUID authorUuid,
+            String authorName,
+            String title,
+            String link,
+            String content,
+            int score,
+            Direction myVote) {
         super(uuid, createdAt);
         this.authorUuid = authorUuid;
         this.authorName = authorName;
@@ -23,5 +34,6 @@ public class PostDTO extends AbstractDTO {
         this.link = link;
         this.content = content;
         this.score = score;
+        this.myVote = myVote;
     }
 }
