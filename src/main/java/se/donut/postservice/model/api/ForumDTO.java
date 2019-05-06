@@ -13,6 +13,7 @@ public class ForumDTO extends AbstractDTO {
     private final String name;
     private final String description;
     private final int subscribers;
+    private final Boolean subscribed;
 
 
     public ForumDTO(
@@ -22,13 +23,14 @@ public class ForumDTO extends AbstractDTO {
             String authorName,
             String name,
             String description,
-            int subscribers
-    ) {
+            int subscribers,
+            Boolean subscribed) {
         super(uuid, createdAt);
         this.authorUuid = authorUuid;
         this.authorName = authorName;
         this.name = name;
         this.description = description;
         this.subscribers = subscribers;
+        this.subscribed = subscribed;
     }
 }

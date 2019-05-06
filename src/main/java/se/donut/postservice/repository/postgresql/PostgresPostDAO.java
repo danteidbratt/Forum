@@ -16,9 +16,8 @@ public class PostgresPostDAO extends PostgresAbstractDAO implements PostAccessor
 
     public Optional<Post> get(UUID uuid) {
         return jdbi.withHandle(handle ->
-                handle.createQuery("SELECT p.*, u.name AS author_name FROM post p " +
-                        "INNER JOIN users u ON u.uuid = p.author_uuid " +
-                        "WHERE p.uuid = :uuid AND p.is_deleted = false")
+                handle.createQuery("SELECT * FROM post " +
+                        "WHERE uuid = :uuid AND is_deleted = false")
                         .bind("uuid", uuid)
                         .mapTo(Post.class)
                         .findFirst()

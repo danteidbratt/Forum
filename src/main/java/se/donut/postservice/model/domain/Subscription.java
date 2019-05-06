@@ -1,19 +1,17 @@
 package se.donut.postservice.model.domain;
 
 
-import lombok.Getter;
+import lombok.Data;
 
-import java.util.Date;
 import java.util.UUID;
 
-@Getter
-public class Subscription extends AbstractEntity {
+@Data
+public class Subscription {
 
     private final UUID userUuid;
     private final UUID forumUuid;
 
-    public Subscription(UUID uuid, UUID userUuid, UUID forumUuid, Date createdAt) {
-        super(uuid, createdAt);
+    public Subscription(UUID userUuid, UUID forumUuid) {
         this.userUuid = userUuid;
         this.forumUuid = forumUuid;
     }

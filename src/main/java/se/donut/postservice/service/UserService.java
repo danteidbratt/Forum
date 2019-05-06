@@ -3,7 +3,7 @@ package se.donut.postservice.service;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.model.domain.User;
-import se.donut.postservice.repository.UserAccessor;
+import se.donut.postservice.repository.postgresql.UserDAO;
 
 import java.util.Date;
 import java.util.Optional;
@@ -14,14 +14,14 @@ import static se.donut.postservice.model.domain.Role.USER;
 
 public class UserService {
 
-    private final UserAccessor userAccessor;
+    private final UserDAO userDAO;
 
-    public UserService(UserAccessor userAccessor) {
-        this.userAccessor = userAccessor;
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     public UserDTO getUser(UUID userUuid) {
-        User user = userAccessor.getUser(userUuid)
+        User user = userDAO.get(userUuid)
                 .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
 
         return user.toApiModel();
@@ -38,12 +38,12 @@ public class UserService {
                 USER,
                 new Date()
         );
-        userAccessor.createUser(user, password);
+        userDAO.createUserWithPassword(user, password);
         return userUuid;
     }
 
     public UserDTO login(String username, String password) {
-        Optional<User> user = userAccessor.authenticate(username, password);
+        Optional<User> user = userDAO.authenticate(username, password);
         if (user.isPresent()) {
             return user.get().toApiModel();
         }
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     private void validateNewUser(String username, String password) {
-        userAccessor.getUser(username).ifPresent(d -> {
+        userDAO.get(username).ifPresent(d -> {
             throw new PostServiceException(USERNAME_ALREADY_EXISTS);
         });
 

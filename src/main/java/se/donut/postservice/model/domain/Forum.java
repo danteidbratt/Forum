@@ -1,6 +1,7 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
+import org.jdbi.v3.core.mapper.reflect.ColumnName;
 import se.donut.postservice.model.api.ForumDTO;
 
 import java.util.Date;
@@ -14,25 +15,29 @@ public class Forum extends Submission {
     public Forum(
             UUID uuid,
             UUID authorUuid,
-            String authorName,
             String name,
             String content,
             int score,
             Date createdAt
     ) {
-        super(uuid, authorUuid, authorName, content, score, createdAt);
+        super(uuid, authorUuid, content, score, createdAt);
         this.name = name;
     }
 
-    public ForumDTO toApiModel() {
+    public ForumDTO toApiModel(String authorName) {
+        return toApiModel(authorName, null);
+    }
+
+    public ForumDTO toApiModel(String authorName, Boolean subscribed) {
         return new ForumDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
                 this.getAuthorUuid(),
-                this.getAuthorName(),
+                authorName,
                 this.getName(),
                 this.getName(),
-                this.getScore()
+                this.getScore(),
+                subscribed
         );
     }
 }

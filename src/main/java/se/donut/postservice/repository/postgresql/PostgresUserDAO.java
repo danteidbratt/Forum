@@ -16,14 +16,16 @@ public class PostgresUserDAO extends PostgresAbstractDAO implements UserAccessor
 
     public Optional<User> getUser(UUID uuid) {
         return jdbi.withHandle(handle ->
-                handle.createQuery("SELECT * FROM users WHERE uuid = :uuid").bind("uuid", uuid)
+                handle.createQuery("SELECT * FROM users WHERE uuid = :uuid")
+                        .bind("uuid", uuid)
                         .mapTo(User.class).findFirst()
         );
     }
 
     public Optional<User> getUser(String name) {
         return jdbi.withHandle(handle ->
-                handle.createQuery("SELECT * FROM users WHERE name = :name").bind("name", name)
+                handle.createQuery("SELECT * FROM users WHERE name = :name")
+                        .bind("name", name)
                         .mapTo(User.class).findFirst()
         );
     }

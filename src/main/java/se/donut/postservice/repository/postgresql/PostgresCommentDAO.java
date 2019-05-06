@@ -20,19 +20,18 @@ public class PostgresCommentDAO extends PostgresAbstractDAO implements CommentAc
     @Override
     public Optional<Comment> getComment(UUID uuid) {
         return jdbi.withHandle(handle ->
-                handle.createQuery("SELECT c.*, u.name AS author_name FROM comment c " +
-                        "INNER JOIN users u ON u.uuid = c.author_uuid " +
-                        "WHERE c.uuid = :uuid")
+                handle.createQuery("SELECT * FROM comment " +
+                        "WHERE c.uuid = :uuid AND is_deleted = false")
                         .bind("uuid", uuid)
-                        .mapTo(Comment.class).findFirst()
+                        .mapTo(Comment.class)
+                        .findFirst()
         );
     }
 
     public List<Comment> getCommentsByPostUuid(UUID postUuid) {
         return jdbi.withHandle(handle ->
-                handle.createQuery("SELECT c.*, u.name AS author_name FROM comment c " +
-                        "INNER JOIN users u ON u.uuid = c.author_uuid " +
-                        "WHERE c.post_uuid = :postUuid AND c.is_deleted = false")
+                handle.createQuery("SELECT * FROM comment " +
+                        "WHERE post_uuid = :postUuid AND is_deleted = false")
                         .bind("postUuid", postUuid)
                         .mapTo(Comment.class)
                         .list()

@@ -1,14 +1,20 @@
 package se.donut.postservice.model.domain;
 
-import lombok.Data;
+import lombok.Getter;
+import org.jdbi.v3.core.mapper.reflect.ColumnName;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Data
+@Getter
 public class AbstractEntity {
 
     private final UUID uuid;
     private final Date createdAt;
+
+    AbstractEntity(UUID uuid, Date createAt) {
+        this.uuid = uuid;
+        this.createdAt = createAt;
+    }
 
 }

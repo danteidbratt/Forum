@@ -17,23 +17,22 @@ public class Comment extends Submission {
     public Comment(
             UUID uuid,
             UUID authorUuid,
-            String authorName,
             String content,
             int score,
             UUID parentUuid,
             UUID postUuid,
             Date createdAt
     ) {
-        super(uuid, authorUuid, authorName, content, score, createdAt);
+        super(uuid, authorUuid, content, score, createdAt);
         this.parentUuid = parentUuid;
         this.postUuid = postUuid;
     }
 
-    public CommentDTO toApiModel(List<CommentDTO> children, Direction myVote) {
+    public CommentDTO toApiModel(List<CommentDTO> children, String authorName, Direction myVote) {
         return new CommentDTO(
                 this.getUuid(),
                 this.getAuthorUuid(),
-                this.getAuthorName(),
+                authorName,
                 this.getContent(),
                 this.getScore(),
                 this.getCreatedAt(),

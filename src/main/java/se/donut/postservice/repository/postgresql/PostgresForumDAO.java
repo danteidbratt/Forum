@@ -15,7 +15,7 @@ public class PostgresForumDAO extends PostgresAbstractDAO implements ForumAccess
     }
 
     public void create(Forum forum) {
-        jdbi.useTransaction(handle -> {
+        jdbi.useHandle(handle -> {
                     handle.createUpdate("INSERT INTO forum " +
                             "(uuid, name, author_uuid, content, score, created_at, is_deleted) " +
                             "VALUES " +
@@ -50,7 +50,7 @@ public class PostgresForumDAO extends PostgresAbstractDAO implements ForumAccess
         return jdbi.withHandle(handle ->
                 handle.createQuery("SELECT f.*, u.name AS author_name FROM forum f " +
                         "INNER JOIN users u ON u.uuid = f.author_uuid " +
-                        "WHERE f.is_deleted = false ")
+                        "WHERE f.is_deleted = false")
                         .mapTo(Forum.class).list()
         );
     }

@@ -44,20 +44,20 @@ public class App extends Application<AppConfig> {
         jdbi.registerRowMapper(new VoteMapper());
         jdbi.registerRowMapper(new SubscriptionMapper());
 
-        UserAccessor userAccessor = new PostgresUserDAO(jdbi);
         CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
         PostAccessor postAccessor = new PostgresPostDAO(jdbi);
-        ForumAccessor forumAccessor = new PostgresForumDAO(jdbi);
-        SubscriptionAccessor subscriptionAccessor = new PostgresSubscriptionDAO(jdbi);
+        UserDAO userDAO = jdbi.onDemand(UserDAO.class);
+        ForumDAO forumDAO = jdbi.onDemand(ForumDAO.class);
+        SubscriptionDAO subscriptionDAO = jdbi.onDemand(SubscriptionDAO.class);
 
-        UserService userService = new UserService(userAccessor);
-        ForumService forumService = new ForumService(forumAccessor, subscriptionAccessor);
+        UserService userService = new UserService(userDAO);
+        ForumService forumService = new ForumService(userDAO, forumDAO, subscriptionDAO);
         CommentService commentService = new CommentService(commentAccessor, postAccessor);
-        PostService postService = new PostService(postAccessor, forumAccessor);
+        PostService postService = new PostService(userDAO, postAccessor, forumDAO);
 
         UserResource userResource = new UserResource(userService);
         PostResource postResource = new PostResource(postService);
-        ForumResource forumResource = new ForumResource(forumService);
+        ForumGuestResource forumResource = new ForumGuestResource(forumService);
         CommentResource commentResource = new CommentResource(commentService);
 
         environment.jersey().register(new AuthDynamicFeature(

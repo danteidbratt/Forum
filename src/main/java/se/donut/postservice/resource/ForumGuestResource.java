@@ -17,21 +17,33 @@ import java.util.UUID;
 @Path("forums")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ForumResource {
+public class ForumGuestResource {
 
     private final ForumService forumService;
 
-    public ForumResource(ForumService forumService) {
+    public ForumGuestResource(ForumService forumService) {
         this.forumService = forumService;
     }
 
+    @Path("guest")
     @GET
-    public List<ForumDTO> getForums(
+    public List<ForumDTO> getForumsAsGuest(
             @DefaultValue("25") @QueryParam("pageSize") int pageSize,
             @DefaultValue("0") @QueryParam("page") int page,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return forumService.getForums(sortType);
+        return forumService.getAllForums(sortType);
+    }
+
+    @PermitAll
+    @GET
+    public List<ForumDTO> getForums(
+            @Auth AuthenticatedUser authenticatedUser,
+            @DefaultValue("25") @QueryParam("pageSize") int pageSize,
+            @DefaultValue("0") @QueryParam("page") int page,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return forumService.getAllForums(authenticatedUser.getUuid(), sortType);
     }
 
     @PermitAll
@@ -42,7 +54,6 @@ public class ForumResource {
     ) {
         return forumService.createForum(
                 user.getUuid(),
-                user.getName(),
                 request.getName(),
                 request.getDescription()
         );
@@ -51,18 +62,22 @@ public class ForumResource {
     @PermitAll
     @Path("{forumUuid}/subscriptions")
     @GET
-    public List<ForumDTO> getSubscriptions(@Auth AuthenticatedUser authenticatedUser) {
-        return forumService.getSubscriptions(authenticatedUser.getUuid());
+    public List<ForumDTO> getSubscriptions(
+            @Auth AuthenticatedUser authenticatedUser,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return forumService.getSubscriptions(authenticatedUser.getUuid(), sortType);
     }
 
     @PermitAll
     @Path("{forumUuid}/subscriptions")
     @POST
-    public UUID subscribe(
+    public Response subscribe(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid
     ) {
-        return forumService.subscribe(authenticatedUser.getUuid(), forumUuid);
+        forumService.subscribe(authenticatedUser.getUuid(), forumUuid);
+        return Response.ok().build();
     }
 
     @PermitAll

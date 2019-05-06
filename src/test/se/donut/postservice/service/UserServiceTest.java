@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.domain.User;
-import se.donut.postservice.repository.UserAccessor;
+import se.donut.postservice.repository.postgresql.UserDAO;
 
 import java.util.Optional;
 
@@ -18,13 +18,13 @@ import static se.donut.postservice.model.domain.Role.USER;
 
 public class UserServiceTest {
 
-    private UserAccessor userAccessor;
+    private UserDAO userDAO;
     private UserService userService;
 
     @Before
     public void setUp() throws Exception {
-        userAccessor = mock(UserAccessor.class);
-        userService = new UserService(userAccessor);
+        userDAO = mock(UserDAO.class);
+        userService = new UserService(userDAO);
     }
 
     @Test
@@ -33,7 +33,7 @@ public class UserServiceTest {
         String name = "some username";
         String password = "secret";
         User user = mock(User.class);
-        doReturn(Optional.of(user)).when(userAccessor).getUser(name);
+        doReturn(Optional.of(user)).when(userDAO).get(name);
 
         // Act
         try {
@@ -50,14 +50,14 @@ public class UserServiceTest {
         // Arrange
         String name = "some username";
         String password = "secret";
-        doReturn(Optional.empty()).when(userAccessor).getUser(name);
+        doReturn(Optional.empty()).when(userDAO).get(name);
 
         // Act
         userService.createUser(name, password);
 
         // Assert
         ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userAccessor, times(1)).createUser(argumentCaptor.capture(), eq(password));
+        verify(userDAO, times(1)).createUser(argumentCaptor.capture());
         User user = argumentCaptor.getValue();
         assertEquals("some username", user.getName());
         assertEquals(Integer.valueOf(0), user.getCarma());

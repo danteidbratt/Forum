@@ -16,7 +16,6 @@ public class Post extends Submission {
     public Post(
             UUID uuid,
             UUID authorUuid,
-            String authorName,
             String content,
             int score,
             UUID forumUuid,
@@ -24,18 +23,22 @@ public class Post extends Submission {
             String link,
             Date createdAt
     ) {
-        super(uuid, authorUuid, authorName, content, score, createdAt);
+        super(uuid, authorUuid, content, score, createdAt);
         this.forumUuid = forumUuid;
         this.title = title;
         this.link = link;
     }
 
     public PostDTO toApiModel() {
+        return toApiModel(null);
+    }
+
+    public PostDTO toApiModel(String authorName) {
         return new PostDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
                 this.getAuthorUuid(),
-                this.getAuthorName(),
+                authorName,
                 this.getTitle(),
                 this.getLink(),
                 this.getContent(),

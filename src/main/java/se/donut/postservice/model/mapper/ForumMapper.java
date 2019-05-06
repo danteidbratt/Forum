@@ -16,7 +16,6 @@ public class ForumMapper implements RowMapper<Forum> {
         return new Forum(
                 UUID.fromString(rs.getString("uuid")),
                 UUID.fromString(rs.getString("author_uuid")),
-                rs.getString("author_name"),
                 rs.getString("name"),
                 rs.getString("content"),
                 rs.getInt("score"),

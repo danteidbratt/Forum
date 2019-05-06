@@ -113,7 +113,6 @@ public class CommentServiceTest {
                     postUuid,
                     parentUuid,
                     authorUuid,
-                    "some username",
                     "some content"
             );
             fail();
@@ -138,7 +137,6 @@ public class CommentServiceTest {
                     postUuid,
                     parentUuid,
                     authorUuid,
-                    "some username",
                     "some content"
             );
             fail();
@@ -164,7 +162,6 @@ public class CommentServiceTest {
         return new Comment(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                "name",
                 "content",
                 score,
                 parentUuid,

@@ -13,7 +13,6 @@ public class PostgresSubscriptionDAO extends PostgresAbstractDAO implements Subs
         super(jdbi);
     }
 
-    @Override
     public Optional<Subscription> get(UUID uuid) {
         return jdbi.withHandle(handle ->
                 handle.createQuery(
@@ -24,7 +23,6 @@ public class PostgresSubscriptionDAO extends PostgresAbstractDAO implements Subs
         );
     }
 
-    @Override
     public void create(Subscription subscription) {
         jdbi.useTransaction(handle -> {
                     handle.createUpdate("INSERT INTO subscription " +
@@ -41,20 +39,20 @@ public class PostgresSubscriptionDAO extends PostgresAbstractDAO implements Subs
         );
     }
 
-    @Override
     public void delete(Subscription subscription) {
         jdbi.useTransaction(handle -> {
-                    handle.createUpdate(
-                            "UPDATE subscription SET is_deleted = true WHERE uuid = :uuid")
-                            .bind("uuid", subscription.getUuid()).execute();
-                    handle.createUpdate(
-                            "UPDATE forum SET subscribers = subscribers + 1 WHERE uuid = :uuid")
+                    handle.createUpdate("DELETE FROM subscription " +
+                                    "WHERE user_uuid = :userUuid AND forum_uuid = :forumUuid")
+                            .bindBean(subscription)
+                            .execute();
+                    handle.createUpdate("UPDATE forum " +
+                            "SET subscribers = subscribers + 1 " +
+                            "WHERE uuid = :uuid")
                             .bind("uuid", subscription.getForumUuid());
                 }
         );
     }
 
-    @Override
     public Optional<Subscription> getByUserAndForum(UUID userUuid, UUID forumUuid) {
         return jdbi.withHandle(handle ->
                 handle.createQuery("SELECT * FROM subscription " +

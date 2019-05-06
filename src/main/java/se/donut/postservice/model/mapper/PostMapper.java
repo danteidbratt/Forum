@@ -15,7 +15,6 @@ public class PostMapper implements RowMapper<Post> {
         return new Post(
                 UUID.fromString(rs.getString("uuid")),
                 UUID.fromString(rs.getString("author_uuid")),
-                rs.getString("author_name"),
                 rs.getString("content"),
                 rs.getInt("score"),
                 UUID.fromString(rs.getString("forum_uuid")),

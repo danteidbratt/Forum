@@ -3,8 +3,9 @@ package se.donut.postservice.service;
 import org.junit.Before;
 import org.junit.Test;
 import se.donut.postservice.exception.PostServiceException;
-import se.donut.postservice.repository.ForumAccessor;
 import se.donut.postservice.repository.PostAccessor;
+import se.donut.postservice.repository.postgresql.ForumDAO;
+import se.donut.postservice.repository.postgresql.UserDAO;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,15 +17,17 @@ import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
 
 public class PostServiceTest {
 
+    private UserDAO userDAO;
     private PostAccessor postAccessor;
-    private ForumAccessor forumAccessor;
+    private ForumDAO forumAccessor;
     private PostService postService;
 
     @Before
     public void setup() {
+        userDAO = mock(UserDAO.class);
         postAccessor = mock(PostAccessor.class);
-        forumAccessor = mock(ForumAccessor.class);
-        postService = new PostService(postAccessor, forumAccessor);
+        forumAccessor = mock(ForumDAO.class);
+        postService = new PostService(userDAO, postAccessor, forumAccessor);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
+import org.jdbi.v3.core.mapper.reflect.ColumnName;
 
 import java.util.Date;
 import java.util.UUID;
@@ -9,21 +10,18 @@ import java.util.UUID;
 public abstract class Submission extends AbstractEntity {
 
     private final UUID authorUuid;
-    private final String authorName;
     private final String content;
     private final int score;
 
     Submission(
             UUID uuid,
             UUID authorUuid,
-            String authorName,
             String content,
             int score,
             Date createdAt
     ) {
         super(uuid, createdAt);
         this.authorUuid = authorUuid;
-        this.authorName = authorName;
         this.content = content;
         this.score = score;
     }

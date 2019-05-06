@@ -38,7 +38,6 @@ public class CommentResource {
                 postUuid,
                 postUuid,
                 authenticatedUser.getUuid(),
-                authenticatedUser.getName(),
                 request.getContent()
         );
         return Response.ok(uuid).build();
@@ -70,7 +69,6 @@ public class CommentResource {
                 postUuid,
                 commentUuid,
                 authenticatedUser.getUuid(),
-                authenticatedUser.getName(),
                 request.getContent()
         );
         return Response.ok(uuid).build();

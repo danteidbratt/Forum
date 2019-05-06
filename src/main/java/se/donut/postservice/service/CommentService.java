@@ -31,7 +31,6 @@ public class CommentService {
             UUID postUuid,
             UUID parentUuid,
             UUID authorUuid,
-            String authorName,
             String content
     ) {
         validateParent(postUuid, parentUuid);
@@ -39,7 +38,6 @@ public class CommentService {
         Comment comment = new Comment(
                 commentUuid,
                 authorUuid,
-                authorName,
                 content,
                 0,
                 parentUuid,
@@ -64,9 +62,8 @@ public class CommentService {
         Vote vote = new Vote(
                 commentUuid,
                 userUuid,
-                direction,
-                new Date());
-
+                direction
+        );
         commentAccessor.vote(vote);
     }
 
@@ -105,7 +102,7 @@ public class CommentService {
         }
         List<CommentDTO> result = new ArrayList<>();
         for (Comment comment : commentMap.get(parentUuid)) {
-            result.add(comment.toApiModel(recurse(commentMap, comment.getUuid()), null));
+            result.add(comment.toApiModel(recurse(commentMap, comment.getUuid()), null, null));
         }
         return result;
     }
