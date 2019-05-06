@@ -49,7 +49,7 @@ public class CommentResource {
             @PathParam("postUuid") UUID postUuid,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return commentService.getCommentTreeByPost(UUID.randomUUID(), postUuid, sortType);
+        return commentService.getCommentTreeByPost(postUuid, sortType);
     }
 
     @PermitAll

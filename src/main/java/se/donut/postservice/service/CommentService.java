@@ -52,38 +52,32 @@ public class CommentService {
         return commentUuid;
     }
 
-//    public List<CommentDTO> getCommentTreeByPost(UUID postUuid, SortType sortType) {
-//        List<Comment> comments = commentDAO.getCommentsByPostUuid(postUuid);
-//        return buildCommentTree(comments, postUuid);
-//    }
+    public List<CommentDTO> getCommentTreeByPost(UUID postUuid, SortType sortType) {
+        List<Comment> comments = commentDAO.getCommentsByPostUuid(postUuid);
+        List<UUID> authorUuids = comments.stream()
+                .map(Comment::getAuthorUuid)
+                .collect(Collectors.toList());
+        Map<UUID, User> authors = userDAO.get(authorUuids);
+        Map<UUID, Vote> myVotes = new HashMap<>();
+        Map<UUID, List<Comment>> commentMap = comments.stream()
+                .sorted(sortType.getComparator())
+                .collect(Collectors.groupingBy(Comment::getParentUuid));
+        return buildCommentTree(commentMap, myVotes, authors, postUuid);
+    }
 
     public List<CommentDTO> getCommentTreeByPost(UUID userUuid, UUID postUuid, SortType sortType) {
         List<Comment> comments = commentDAO.getCommentsByPostUuid(postUuid);
-        Map<UUID, Vote> myVotes = commentDAO.getVotes(userUuid, postUuid);
-
-        List<UUID> userUuids = comments.stream()
+        List<UUID> authorUuids = comments.stream()
                 .map(Comment::getAuthorUuid)
                 .collect(Collectors.toList());
-
-        Map<UUID, User> authors = userDAO.get(userUuids);
+        Map<UUID, User> authors = userDAO.get(authorUuids);
+        Map<UUID, Vote> myVotes = commentDAO.getVotes(userUuid, postUuid);
         Map<UUID, List<Comment>> commentMap = comments.stream()
+                .sorted(sortType.getComparator())
                 .collect(Collectors.groupingBy(Comment::getParentUuid));
 
-        Map<UUID, List<CommentDTO>> dtos = new HashMap<>();
-        commentMap.forEach((key, value) -> dtos.put(
-                key,
-                value.stream().map(c -> {
-                    Vote myVote = myVotes.get(c.getUuid());
-                    User author = authors.get(c.getAuthorUuid());
-                    return c.toApiModel(
-                            author != null ? author.getName() : null,
-                            myVote != null ? myVote.getDirection() : null
-                    );
-                }).collect(Collectors.toList())
-        ));
 
-        return buildCommentTree(dtos, postUuid);
-
+        return buildCommentTree(commentMap, myVotes, authors, postUuid);
     }
 
     public void vote(UUID userUuid, UUID postUuid, UUID commentUuid, Direction direction) {
@@ -115,41 +109,36 @@ public class CommentService {
         }
     }
 
-    private List<CommentDTO> buildCommentTree(Map<UUID, List<CommentDTO>> comments, UUID parentUuid) {
+    private List<CommentDTO> buildCommentTree(
+            Map<UUID, List<Comment>> comments,
+            Map<UUID, Vote> myVotes,
+            Map<UUID, User> authors,
+            UUID postUuid
+    ) {
+        Map<UUID, List<CommentDTO>> dtos = comments.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        x -> x.getValue().stream().map(c -> {
+                            Vote myVote = myVotes.get(c.getUuid());
+                            User author = authors.get(c.getAuthorUuid());
+                            return c.toApiModel(
+                                    author != null ? author.getName() : null,
+                                    myVote != null ? myVote.getDirection() : null
+                            );
+                        }).collect(Collectors.toList())
+                ));
+        return recurse(dtos, postUuid);
+    }
+
+    private List<CommentDTO> recurse(Map<UUID, List<CommentDTO>> comments, UUID parentUuid) {
         if (!comments.containsKey(parentUuid)) {
             return new ArrayList<>();
         }
 
         for (CommentDTO comment : comments.get(parentUuid)) {
-            comment.setChildren(buildCommentTree(comments, comment.getUuid()));
+            comment.setChildren(recurse(comments, comment.getUuid()));
         }
 
         return comments.get(parentUuid);
     }
 }
-//    private List<CommentDTO> buildCommentTree(
-//            UUID postUuid,
-//            List<Comment> comments,
-//            SortType sortType
-//    ) {
-//        Map<UUID, List<Comment>> commentMap = comments.stream()
-//                .sorted(sortType.getComparator())
-//                .collect(Collectors.groupingBy(Comment::getParentUuid));
-//
-//        return recurse(commentMap, postUuid);
-//    }
-//
-//    private List<CommentDTO> recurse(Map<UUID, List<Comment>> commentMap, UUID parentUuid) {
-//        if (!commentMap.containsKey(parentUuid)) {
-//            return null;
-//        }
-//        List<CommentDTO> result = new ArrayList<>();
-//        for (Comment comment : commentMap.get(parentUuid)) {
-//            result.add(comment.toApiModel(
-//                    recurse(
-//                            commentMap,
-//                            comment.getUuid()),
-//                    null));
-//        }
-//        return result;
-//    }

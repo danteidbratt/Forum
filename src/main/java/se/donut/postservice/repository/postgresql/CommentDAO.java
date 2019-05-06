@@ -6,7 +6,6 @@ import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
-import se.donut.postservice.model.CommentView;
 import se.donut.postservice.model.domain.Comment;
 import se.donut.postservice.model.domain.Vote;
 import se.donut.postservice.model.mapper.VoteMapper;
