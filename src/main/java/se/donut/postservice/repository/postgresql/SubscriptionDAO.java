@@ -9,6 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import se.donut.postservice.model.domain.Subscription;
 import se.donut.postservice.model.mapper.SubscriptionMapper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,9 +28,7 @@ public interface SubscriptionDAO {
 
     @SqlQuery("SELECT * FROM subscription " +
             "WHERE user_uuid = :userUuid")
-    @KeyColumn("forum_uuid")
-    @RegisterConstructorMapper(SubscriptionMapper.class)
-    Map<UUID, Subscription> getByUser(@Bind("userUuid") UUID userUuid);
+    List<Subscription> getByUser(@Bind("userUuid") UUID userUuid);
 
     @SqlQuery("SELECT * FROM subscription " +
             "WHERE user_uuid = :userUuid AND forum_uuid = :forumUuid")

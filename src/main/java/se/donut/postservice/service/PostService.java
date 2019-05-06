@@ -15,8 +15,7 @@ import se.donut.postservice.resource.request.SortType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
-import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.*;
 
 public class PostService {
 
@@ -31,57 +30,53 @@ public class PostService {
     }
 
     public PostDTO getPost(UUID postUuid) {
+        return getPost(postUuid, null);
+    }
+
+    public PostDTO getPost(UUID postUuid, UUID userUuid) {
         Post post = postDAO.get(postUuid)
                 .orElseThrow(() -> new PostServiceException(POST_NOT_FOUND));
+
         Optional<User> author = userDAO.get(post.getAuthorUuid());
 
-        if (author.isPresent()) {
-            return post.toApiModel(author.get().getName());
-        }
+        Optional<Vote> userVote = postDAO.getVote(userUuid, postUuid);
 
-        return post.toApiModel();
+        return post.toApiModel(
+                author.map(User::getName).orElse(null),
+                userVote.map(Vote::getDirection).orElse(null)
+        );
     }
 
     public List<PostDTO> getByForum(UUID forumUuid, SortType sortType) {
-        List<Post> posts = postDAO.getByForum(forumUuid);
-        List<UUID> userUuids = posts.stream()
-                .map(Post::getAuthorUuid)
-                .collect(Collectors.toList());
-        Map<UUID, User> users = userDAO.get(userUuids);
-
-        return posts.stream()
-                .sorted(sortType.getComparator())
-                .map(p -> {
-                    User user = users.get(p.getAuthorUuid());
-                    return p.toApiModel(
-                            user != null ? user.getName() : null
-                    );
-                })
-                .collect(Collectors.toList());
+        return getByForum(forumUuid, sortType, null);
     }
 
-    public List<PostDTO> getByForum(UUID userUuid, UUID forumUuid, SortType sortType) {
+    public List<PostDTO> getByForum(UUID forumUuid, SortType sortType, UUID userUuid) {
         List<Post> posts = postDAO.getByForum(forumUuid);
-        Map<UUID, Vote> votes = postDAO.getVotes(userUuid, forumUuid);
-        List<UUID> userUuids = posts.stream()
-                .map(Post::getAuthorUuid)
-                .collect(Collectors.toList());
-        Map<UUID, User> users = userDAO.get(userUuids);
-
-        return posts.stream()
-                .sorted(sortType.getComparator())
-                .map(p -> {
-                    User user = users.get(p.getAuthorUuid());
-                    Vote vote = votes.get(p.getUuid());
-                    return p.toApiModel(
-                            user != null ? user.getName() : null,
-                            vote != null ? vote.getDirection() : null
-                    );
-                })
-                .collect(Collectors.toList());
+        return buildApiModels(posts, sortType, userUuid);
     }
 
-    public UUID createPost(UUID forumUuid, UUID authorUuid, String authorName, String title, String link, String content) {
+    public List<PostDTO> getByAuthor(UUID authorUuid) {
+        return getByAuthor(authorUuid, null);
+    }
+
+    public List<PostDTO> getByAuthor(UUID authorUuid, UUID userUuid) {
+        List<Post> posts = postDAO.getByAuthor(authorUuid);
+        return buildApiModels(posts, SortType.NEW, userUuid);
+    }
+
+    public List<PostDTO> getLiked(UUID likerUuid) {
+        List<Post> posts = postDAO.getLiked(likerUuid);
+        return buildApiModels(posts, SortType.NEW, null);
+
+    }
+
+    public List<PostDTO> getLiked(UUID likerUuid, UUID userUuid) {
+        List<Post> posts = postDAO.getLiked(likerUuid);
+        return buildApiModels(posts, SortType.NEW, userUuid);
+    }
+
+    public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String link, String content) {
         Forum forum = forumDAO.get(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
         UUID postUuid = UUID.randomUUID();
         Post post = new Post(
@@ -107,4 +102,39 @@ public class PostService {
         postDAO.deleteVote(userUuid, postUuid);
     }
 
+    private List<PostDTO> buildApiModels(List<Post> posts, SortType sortType, UUID userUuid) {
+        if (posts.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<UUID> postUuids = posts.stream()
+                .map(Post::getUuid)
+                .collect(Collectors.toList());
+
+        Map<UUID, Vote> votes = userUuid != null ?
+                postDAO.getVotes(userUuid, postUuids).stream()
+                        .collect(Collectors.toMap(
+                                Vote::getTargetUuid,
+                                x -> x
+                        ))
+                : new HashMap<>();
+
+        List<UUID> authorUuids = posts.stream()
+                .map(Post::getAuthorUuid)
+                .collect(Collectors.toList());
+
+        Map<UUID, User> authors = userDAO.get(authorUuids);
+
+        return posts.stream()
+                .sorted(sortType.getComparator())
+                .map(p -> {
+                    User author = authors.get(p.getAuthorUuid());
+                    Vote vote = votes.get(p.getUuid());
+                    return p.toApiModel(
+                            author != null ? author.getName() : null,
+                            vote != null ? vote.getDirection() : null
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 }

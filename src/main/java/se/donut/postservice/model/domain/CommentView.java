@@ -8,34 +8,36 @@ import java.util.Date;
 import java.util.UUID;
 
 @Getter
-public class Comment extends Submission {
+public class CommentView extends Comment {
 
-    private final UUID parentUuid;
-    private final UUID postUuid;
+    private final String authorName;
+    private final Direction myVote;
 
-    public Comment(
+    public CommentView(
             UUID uuid,
             UUID authorUuid,
-            String content,
-            int score,
             UUID parentUuid,
             UUID postUuid,
-            Date createdAt
+            String content,
+            int score,
+            Date createdAt,
+            String authorName,
+            Direction myVote
     ) {
-        super(uuid, authorUuid, content, score, createdAt);
-        this.parentUuid = parentUuid;
-        this.postUuid = postUuid;
+        super(uuid, authorUuid, content, score, parentUuid, postUuid, createdAt);
+        this.authorName = authorName;
+        this.myVote = myVote;
     }
 
-    public CommentDTO toApiModel(String authorName, Direction myVote) {
+    public CommentDTO toApiModel() {
         return new CommentDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
                 this.getAuthorUuid(),
-                authorName,
+                this.getAuthorName(),
                 this.getContent(),
                 this.getScore(),
-                myVote
+                this.myVote
         );
     }
 

@@ -36,7 +36,6 @@ public class PostResource {
         UUID uuid = postService.createPost(
                 forumUuid,
                 authenticatedUser.getUuid(),
-                authenticatedUser.getName(),
                 request.getTitle(),
                 request.getLink(),
                 request.getContent()
@@ -60,12 +59,21 @@ public class PostResource {
             @PathParam("forumUuid") UUID forumUuid,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getByForum(authenticatedUser.getUuid(), forumUuid, sortType);
+        return postService.getByForum(forumUuid, sortType, authenticatedUser.getUuid());
     }
 
+    @Path("{postUuid}/guest")
+    @GET
+    public PostDTO getPostAsGuest(
+            @PathParam("postUuid") UUID postUuid) {
+        return postService.getPost(postUuid);
+    }
+
+    @PermitAll
     @Path("{postUuid}")
     @GET
     public PostDTO getPost(
+            @Auth AuthenticatedUser authenticatedUser,
             @PathParam("postUuid") UUID postUuid) {
         return postService.getPost(postUuid);
     }

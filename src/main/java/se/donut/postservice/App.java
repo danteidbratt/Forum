@@ -16,10 +16,12 @@ import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.auth.UserAuthenticator;
 import se.donut.postservice.auth.UserAuthorizer;
 import se.donut.postservice.model.mapper.*;
-import se.donut.postservice.repository.*;
 import se.donut.postservice.repository.postgresql.*;
 import se.donut.postservice.resource.*;
-import se.donut.postservice.service.*;
+import se.donut.postservice.service.CommentService;
+import se.donut.postservice.service.ForumService;
+import se.donut.postservice.service.PostService;
+import se.donut.postservice.service.UserService;
 
 public class App extends Application<AppConfig> {
 
@@ -37,15 +39,15 @@ public class App extends Application<AppConfig> {
     public void run(AppConfig appConfig, Environment environment) throws Exception {
         JdbiFactory jdbiFactory = new JdbiFactory();
         Jdbi jdbi = jdbiFactory.build(environment, appConfig.getDatabase(), "postgresql");
+
         jdbi.registerRowMapper(new UserMapper());
         jdbi.registerRowMapper(new ForumMapper());
         jdbi.registerRowMapper(new PostMapper());
         jdbi.registerRowMapper(new CommentMapper());
         jdbi.registerRowMapper(new VoteMapper());
         jdbi.registerRowMapper(new SubscriptionMapper());
+        jdbi.registerRowMapper(new CommentViewMapper());
 
-        CommentAccessor commentAccessor = new PostgresCommentDAO(jdbi);
-        PostAccessor postAccessor = new PostgresPostDAO(jdbi);
         CommentDAO commentDAO = jdbi.onDemand(CommentDAO.class);
         PostDAO postDAO = jdbi.onDemand(PostDAO.class);
         UserDAO userDAO = jdbi.onDemand(UserDAO.class);
@@ -57,7 +59,7 @@ public class App extends Application<AppConfig> {
         CommentService commentService = new CommentService(commentDAO, postDAO, userDAO);
         PostService postService = new PostService(userDAO, postDAO, forumDAO);
 
-        UserResource userResource = new UserResource(userService);
+        UserResource userResource = new UserResource(userService, postService);
         PostResource postResource = new PostResource(postService);
         ForumGuestResource forumResource = new ForumGuestResource(forumService);
         CommentResource commentResource = new CommentResource(commentService);

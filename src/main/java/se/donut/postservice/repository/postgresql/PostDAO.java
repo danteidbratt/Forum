@@ -4,6 +4,7 @@ import org.jdbi.v3.sqlobject.config.KeyColumn;
 import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import se.donut.postservice.model.domain.Post;
@@ -36,13 +37,29 @@ public interface PostDAO {
     List<Post> getByForum(@Bind("forumUuid") UUID forumUuid);
 
     @SqlQuery("SELECT * FROM post_vote " +
-            "WHERE user_uuid = userUuid AND target_parent_uuid = :forumUuid")
-    @KeyColumn("target_uuid")
-    @RegisterConstructorMapper(VoteMapper.class)
-    Map<UUID, Vote> getVotes(
+            "WHERE user_uuid = :userUuid AND target_uuid IN (<postUuids>)")
+    List<Vote> getVotes(
             @Bind("userUuid") UUID userUuid,
-            @Bind("forumUuid") UUID forumUuid
+            @BindList("postUuids") List<UUID> postUuids
     );
+
+    @SqlQuery("SELECT * FROM post_vote " +
+            "WHERE user_uuid = :userUuid AND target_uuid = :postUuid)")
+    Optional<Vote> getVote(
+            @Bind("userUuid") UUID userUuid,
+            @Bind("postUuid") UUID postUuids
+    );
+
+    @SqlQuery("SELECT * FROM post " +
+            "WHERE author_uuid = :authorUuid " +
+            "AND is_deleted = false")
+    List<Post> getByAuthor(@Bind("authorUuid") UUID authorUuid);
+
+    @SqlQuery("SELECT * FROM post p " +
+            "INNER JOIN post_vote v ON v.target_uuid = p.uuid " +
+            "AND v.direction = 'UP' " +
+            "WHERE v.user_uuid = :userUuid")
+    List<Post> getLiked(@Bind("userUuid") UUID userUuid);
 
     @SqlUpdate("INSERT INTO post_vote " +
             "(target_uuid, target_parent_uuid, user_uuid, direction) " +

@@ -41,7 +41,6 @@ public class PostServiceTest {
             postService.createPost(
                     forumUuid,
                     UUID.randomUUID(),
-                    "some name",
                     "some title",
                     "www.somelink.com",
                     "some contet"

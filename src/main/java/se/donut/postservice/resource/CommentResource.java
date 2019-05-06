@@ -1,5 +1,6 @@
 package se.donut.postservice.resource;
 
+import com.codahale.metrics.annotation.Timed;
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.CommentDTO;
@@ -49,7 +50,7 @@ public class CommentResource {
             @PathParam("postUuid") UUID postUuid,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return commentService.getCommentTreeByPost(postUuid, sortType);
+        return commentService.getCommentsByPost(postUuid, sortType);
     }
 
     @PermitAll
@@ -59,7 +60,8 @@ public class CommentResource {
             @PathParam("postUuid") UUID postUuid,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return commentService.getCommentTreeByPost(authenticatedUser.getUuid(), postUuid, sortType);
+        return commentService.getCommentViews(authenticatedUser.getUuid(), postUuid, sortType);
+//        return commentService.getCommentsByPost(authenticatedUser.getUuid(), postUuid, sortType);
     }
 
     @PermitAll

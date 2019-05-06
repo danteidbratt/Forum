@@ -8,13 +8,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Getter
-public class Post extends Submission {
+public class PostView extends Post {
 
-    private final UUID forumUuid;
-    private final String title;
-    private final String link;
+    private final String authorName;
+    private final Direction myVote;
 
-    public Post(
+    public PostView(
             UUID uuid,
             UUID authorUuid,
             String content,
@@ -22,25 +21,26 @@ public class Post extends Submission {
             UUID forumUuid,
             String title,
             String link,
-            Date createdAt
+            Date createdAt,
+            String authorName,
+            Direction myVote
     ) {
-        super(uuid, authorUuid, content, score, createdAt);
-        this.forumUuid = forumUuid;
-        this.title = title;
-        this.link = link;
+        super(uuid, authorUuid, content, score, forumUuid, title, link, createdAt);
+        this.authorName = authorName;
+        this.myVote = myVote;
     }
 
-    public PostDTO toApiModel(String authorName, Direction direction) {
+    public PostDTO toApiModel() {
         return new PostDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
                 this.getAuthorUuid(),
-                authorName,
+                this.getAuthorName(),
                 this.getTitle(),
                 this.getLink(),
                 this.getContent(),
                 this.getScore(),
-                direction
+                this.getMyVote()
         );
     }
 }

@@ -13,8 +13,4 @@ abstract class AbstractDTO {
     private final UUID uuid;
     private final Date createdAt;
 
-    public String getCreatedAt() {
-        return createdAt.toString();
-    }
-
 }

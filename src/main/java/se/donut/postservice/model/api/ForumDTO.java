@@ -1,11 +1,13 @@
 package se.donut.postservice.model.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ForumDTO extends AbstractDTO {
 
     private final UUID authorUuid;

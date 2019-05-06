@@ -39,12 +39,17 @@ public class ForumService {
     }
 
     public List<ForumDTO> getAllForums(UUID userUuid, SortType sortType) {
-        Map<UUID, Subscription> subscriptions = subscriptionDAO.getByUser(userUuid);
+        Map<UUID, Subscription> subscriptions = subscriptionDAO.getByUser(userUuid).stream()
+                .collect(Collectors.toMap(Subscription::getForumUuid, s -> s));
+
         List<Forum> forums = forumDAO.getAll();
+
         List<UUID> userUuids = forums.stream()
                 .map(Forum::getAuthorUuid)
                 .collect(Collectors.toList());
+
         Map<UUID, User> users = userDAO.get(userUuids);
+
         return forums.stream()
                 .sorted(sortType.getComparator())
                 .map(f -> f.toApiModel(
@@ -54,17 +59,26 @@ public class ForumService {
     }
 
     public List<ForumDTO> getSubscriptions(UUID userUuid, SortType sortType) {
-        Map<UUID, Subscription> subscriptions = subscriptionDAO.getByUser(userUuid);
+        Map<UUID, Subscription> subscriptions = subscriptionDAO.getByUser(userUuid).stream()
+                .collect(Collectors.toMap(Subscription::getForumUuid, s -> s));
+
+        if (subscriptions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<UUID> forumUuids = subscriptions.values().stream()
                 .map(Subscription::getForumUuid)
                 .collect(Collectors.toList());
+
         List<Forum> forums = forumDAO.get(forumUuids);
+
         List<UUID> userUuids = forums.stream()
                 .map(Forum::getAuthorUuid)
                 .collect(Collectors.toList());
+
         Map<UUID, User> users = userDAO.get(userUuids);
 
-        return forumDAO.get(forumUuids).stream()
+        return forums.stream()
                 .sorted(sortType.getComparator())
                 .map(f -> f.toApiModel(users.get(f.getAuthorUuid()).getName(), true))
                 .collect(Collectors.toList());

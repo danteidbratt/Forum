@@ -7,8 +7,6 @@ import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.domain.Comment;
 import se.donut.postservice.model.domain.Post;
-import se.donut.postservice.repository.CommentAccessor;
-import se.donut.postservice.repository.PostAccessor;
 import se.donut.postservice.repository.postgresql.CommentDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
@@ -37,69 +35,69 @@ public class CommentServiceTest {
         commentService = new CommentService(commentDAO, postDAO, userDAO);
     }
 
-//    @Test
-//    public void shouldBeAbleToSortCommentByTop() {
-//        // Arrange
-//        UUID postUuid = UUID.randomUUID();
-//        int numberOfComments = 10;
-//        List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
-//        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
-//
-//        // Act
-//        List<CommentDTO> commentTree = commentService.getCommentTreeByPost(postUuid, SortType.TOP);
-//
-//        // Assert
-//        assertEquals(numberOfComments, commentTree.size());
-//        int previousScore = Integer.MAX_VALUE;
-//        for (CommentDTO commentDTO : commentTree) {
-//            assertTrue(commentDTO.getScore() <= previousScore);
-//            previousScore = commentDTO.getScore();
-//        }
-//    }
+    @Test
+    public void shouldBeAbleToSortCommentByTop() {
+        // Arrange
+        UUID postUuid = UUID.randomUUID();
+        int numberOfComments = 10;
+        List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
+        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
 
-//    @Test
-//    public void shouldBeAbleToSortCommentByNew() {
-//        // Arrange
-//        UUID postUuid = UUID.randomUUID();
-//        int numberOfComments = 10;
-//        List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
-//        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
-//
-//        // Act
-//        List<CommentDTO> commentTree = commentService.getCommentTreeByPost(postUuid, SortType.NEW);
-//
-//        // Assert
-//        assertEquals(numberOfComments, commentTree.size());
-//        Date previousInstant = new Date(Long.MAX_VALUE);
-//        for (CommentDTO commentDTO : commentTree) {
-//            assertTrue(previousInstant.after(commentDTO.getCreatedAt()));
-//            previousInstant = commentDTO.getCreatedAt();
-//        }
-//    }
+        // Act
+        List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, SortType.TOP);
 
-//    @Test
-//    public void shouldBeAbleToNestCommentsRecursively() {
-//        // Arrange
-//        UUID postUuid = UUID.randomUUID();
-//        Date now = new Date();
-//        Comment comment0 = generateComment(postUuid, postUuid, 2, now);
-//        Comment comment00 = generateComment(postUuid, comment0.getUuid(), 2, now);
-//        Comment comment000 = generateComment(postUuid, comment00.getUuid(), 2, now);
-//        Comment comment01 = generateComment(postUuid, comment0.getUuid(), 1, now);
-//        Comment comment1 = generateComment(postUuid, postUuid, 1, now);
-//        List<Comment> comments = Arrays.asList(comment0, comment00, comment000, comment01, comment1);
-//        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
-//
-//        // Act
-//        List<CommentDTO> commentTree = commentService.getCommentTreeByPost(postUuid, SortType.TOP);
-//
-//        // Assert
-//        assertEquals(commentTree.get(0).getUuid(), comment0.getUuid());
-//        assertEquals(commentTree.get(0).getChildren().get(0).getUuid(), comment00.getUuid());
-//        assertEquals(commentTree.get(0).getChildren().get(0).getChildren().get(0).getUuid(), comment000.getUuid());
-//        assertEquals(commentTree.get(0).getChildren().get(1).getUuid(), comment01.getUuid());
-//        assertEquals(commentTree.get(1).getUuid(), comment1.getUuid());
-//    }
+        // Assert
+        assertEquals(numberOfComments, commentTree.size());
+        int previousScore = Integer.MAX_VALUE;
+        for (CommentDTO commentDTO : commentTree) {
+            assertTrue(commentDTO.getScore() <= previousScore);
+            previousScore = commentDTO.getScore();
+        }
+    }
+
+    @Test
+    public void shouldBeAbleToSortCommentByNew() {
+        // Arrange
+        UUID postUuid = UUID.randomUUID();
+        int numberOfComments = 10;
+        List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
+        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
+
+        // Act
+        List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, SortType.NEW);
+
+        // Assert
+        assertEquals(numberOfComments, commentTree.size());
+        Date previousInstant = new Date(Long.MAX_VALUE);
+        for (CommentDTO commentDTO : commentTree) {
+            assertTrue(previousInstant.after(commentDTO.getCreatedAt()));
+            previousInstant = commentDTO.getCreatedAt();
+        }
+    }
+
+    @Test
+    public void shouldBeAbleToNestCommentsRecursively() {
+        // Arrange
+        UUID postUuid = UUID.randomUUID();
+        Date now = new Date();
+        Comment comment0 = generateComment(postUuid, postUuid, 2, now);
+        Comment comment00 = generateComment(postUuid, comment0.getUuid(), 2, now);
+        Comment comment000 = generateComment(postUuid, comment00.getUuid(), 2, now);
+        Comment comment01 = generateComment(postUuid, comment0.getUuid(), 1, now);
+        Comment comment1 = generateComment(postUuid, postUuid, 1, now);
+        List<Comment> comments = Arrays.asList(comment0, comment00, comment000, comment01, comment1);
+        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
+
+        // Act
+        List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, SortType.TOP);
+
+        // Assert
+        assertEquals(commentTree.get(0).getUuid(), comment0.getUuid());
+        assertEquals(commentTree.get(0).getChildren().get(0).getUuid(), comment00.getUuid());
+        assertEquals(commentTree.get(0).getChildren().get(0).getChildren().get(0).getUuid(), comment000.getUuid());
+        assertEquals(commentTree.get(0).getChildren().get(1).getUuid(), comment01.getUuid());
+        assertEquals(commentTree.get(1).getUuid(), comment1.getUuid());
+    }
 
     @Test
     public void shouldNotBeAbleToCreateCommentOnNonExistingComment() {
