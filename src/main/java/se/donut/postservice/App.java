@@ -46,7 +46,6 @@ public class App extends Application<AppConfig> {
         jdbi.registerRowMapper(new CommentMapper());
         jdbi.registerRowMapper(new VoteMapper());
         jdbi.registerRowMapper(new SubscriptionMapper());
-        jdbi.registerRowMapper(new CommentViewMapper());
 
         CommentDAO commentDAO = jdbi.onDemand(CommentDAO.class);
         PostDAO postDAO = jdbi.onDemand(PostDAO.class);

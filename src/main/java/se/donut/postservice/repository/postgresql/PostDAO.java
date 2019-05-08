@@ -76,8 +76,7 @@ public interface PostDAO {
             "WHERE user_uuid = :userUuid " +
             "AND target_uuid = :targetUuid")
     void deleteVote(
-            @Bind("userUuid") UUID userUuid,
-            @Bind("targetUuid") UUID targetUuid
+            @BindBean Vote vote
     );
 
     @SqlUpdate("UPDATE post SET score = score + :diff WHERE uuid = :postUuid")
@@ -86,6 +85,12 @@ public interface PostDAO {
     @Transaction
     default void voteAndUpdateScore(Vote vote) {
         createVote(vote);
+        updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? 1 : -1);
+    }
+
+    @Transaction
+    default void deleteVoteAndUpdateScore(Vote vote) {
+        deleteVote(vote);
         updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? 1 : -1);
     }
 

@@ -21,30 +21,6 @@ public interface CommentDAO {
             "WHERE post_uuid = :postUuid")
     List<Comment> getCommentsByPostUuid(@Bind("postUuid") UUID postUuid);
 
-//    @SqlQuery("SELECT " +
-//            "c.uuid AS uuid, " +
-//            "c.author_uuid AS author_uuid, " +
-//            "c.parent_uuid AS parent_uuid, " +
-//            "u.name AS author_name, " +
-//            "c.content AS content, " +
-//            "c.post_uuid AS post_uuid, " +
-//            "COUNT(v.*) AS score, " +
-//            "c.created_at AS created_at, " +
-//            "(SELECT m.direction FROM comment_vote m " +
-//            "WHERE m.user_uuid = :userUuid " +
-//            "AND m.target_uuid = c.uuid) AS my_vote " +
-//            "FROM comment c " +
-//            "INNER JOIN users u ON u.uuid = c.author_uuid " +
-//            "LEFT JOIN comment_vote v ON v.target_uuid = c.uuid " +
-//            "WHERE c.post_uuid = :postUuid " +
-//            "GROUP BY c.uuid, u.uuid " +
-//            "ORDER BY <sorting> DESC")
-//    List<CommentBundle> getCommentViews(
-//            @Bind("postUuid") UUID postUuid,
-//            @Bind("userUuid") UUID userUuid,
-//            @Define("sorting") String sorting
-//    );
-
     @SqlUpdate("INSERT INTO comment " +
             "(uuid, author_uuid, content, score, parent_uuid, post_uuid, created_at, is_deleted) " +
             "VALUES " +
