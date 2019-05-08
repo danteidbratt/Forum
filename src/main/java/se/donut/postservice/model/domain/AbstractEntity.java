@@ -1,7 +1,6 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
-import org.jdbi.v3.core.mapper.reflect.ColumnName;
 
 import java.util.Date;
 import java.util.UUID;

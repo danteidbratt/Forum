@@ -1,7 +1,6 @@
 package se.donut.postservice.model.domain;
 
 import lombok.Getter;
-import org.jdbi.v3.core.mapper.reflect.ColumnName;
 import se.donut.postservice.model.api.ForumDTO;
 
 import java.util.Date;

@@ -1,27 +1,23 @@
 package se.donut.postservice.resource.request;
 
-import se.donut.postservice.model.domain.Submission;
+import se.donut.postservice.model.Sortable;
 
 import java.util.Comparator;
 
 public enum SortType {
 
-    TOP("score", (a, b) -> b.getScore() - a.getScore()),
-    NEW("created_at", (a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+    TOP((a, b) -> b.getScore() - a.getScore()),
+    NEW((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt())),
+    HOT((a, b) -> Double.compare(b.getHeat(), a.getHeat()));
 
-    private final String columnName;
-    private final Comparator<Submission> comparator;
+    private final Comparator<Sortable> comparator;
 
-    SortType(String columnName, Comparator<Submission> comparator) {
-        this.columnName = columnName;
+    SortType(Comparator<Sortable> comparator) {
         this.comparator = comparator;
     }
 
-    public Comparator<Submission> getComparator() {
+    public Comparator<Sortable> getComparator() {
         return comparator;
     }
 
-    public String getColumnName() {
-        return columnName;
-    }
 }

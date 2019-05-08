@@ -8,12 +8,12 @@ import java.util.Date;
 import java.util.UUID;
 
 @Getter
-public class CommentView extends Comment {
+public class CommentBundle extends Comment {
 
     private final String authorName;
     private final Direction myVote;
 
-    public CommentView(
+    public CommentBundle(
             UUID uuid,
             UUID authorUuid,
             UUID parentUuid,

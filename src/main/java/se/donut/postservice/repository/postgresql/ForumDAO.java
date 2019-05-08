@@ -30,6 +30,11 @@ public interface ForumDAO {
             "WHERE is_deleted = false")
     List<Forum> getAll();
 
+    @SqlQuery("SELECT f.* FROM forum f " +
+            "INNER JOIN subscription s ON s.forum_uuid = f.uuid " +
+            "WHERE s.user_uuid = :userUuid")
+    List<Forum> getSubscriptions(@Bind("userUuid") UUID userUuid);
+
     @SqlQuery("SELECT * FROM forum " +
             "WHERE is_deleted = false AND uuid IN (<uuids>)")
     List<Forum> get(@BindList("uuids") List<UUID> uuids);

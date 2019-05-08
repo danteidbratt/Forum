@@ -1,22 +1,25 @@
 package se.donut.postservice.repository.postgresql;
 
-import org.jdbi.v3.sqlobject.config.KeyColumn;
-import org.jdbi.v3.sqlobject.config.RegisterConstructorMapper;
+import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.jdbi.v3.sqlobject.transaction.Transaction;
 import se.donut.postservice.model.domain.Post;
 import se.donut.postservice.model.domain.Vote;
-import se.donut.postservice.model.mapper.VoteMapper;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import static se.donut.postservice.model.Direction.UP;
+
 public interface PostDAO {
+
+    @CreateSqlObject
+    UserDAO getUserDAO();
 
     @SqlQuery("SELECT * FROM post " +
             "WHERE uuid = :uuid AND is_deleted = false")
@@ -26,9 +29,9 @@ public interface PostDAO {
     void delete(Post post);
 
     @SqlUpdate("INSERT INTO post " +
-            "(uuid, author_uuid, content, score, forum_uuid, title, link, created_at, is_deleted) " +
+            "(uuid, author_uuid, content, score, forum_uuid, title, created_at, is_deleted) " +
             "VALUES " +
-            "(:uuid, :authorUuid, :content, :score, :forumUuid, :title, :link, :createdAt, false)")
+            "(:uuid, :authorUuid, :content, :score, :forumUuid, :title, :createdAt, false)")
     void create(@BindBean Post post);
 
     @SqlQuery("SELECT p.*, u.name AS author_name FROM post p " +
@@ -44,7 +47,7 @@ public interface PostDAO {
     );
 
     @SqlQuery("SELECT * FROM post_vote " +
-            "WHERE user_uuid = :userUuid AND target_uuid = :postUuid)")
+            "WHERE user_uuid = :userUuid AND target_uuid = :postUuid")
     Optional<Vote> getVote(
             @Bind("userUuid") UUID userUuid,
             @Bind("postUuid") UUID postUuids
@@ -67,7 +70,7 @@ public interface PostDAO {
             "(:targetUuid, :targetParentUuid, :userUuid, :direction) " +
             "ON CONFLICT (user_uuid, target_uuid) DO UPDATE " +
             "SET direction = :direction")
-    void vote(@BindBean Vote vote);
+    void createVote(@BindBean Vote vote);
 
     @SqlUpdate("DELETE FROM post_vote " +
             "WHERE user_uuid = :userUuid " +
@@ -76,5 +79,14 @@ public interface PostDAO {
             @Bind("userUuid") UUID userUuid,
             @Bind("targetUuid") UUID targetUuid
     );
+
+    @SqlUpdate("UPDATE post SET score = score + :diff WHERE uuid = :postUuid")
+    void updateScoreOnPost(@Bind("postUuid") UUID postUuid, @Bind("diff") int diff);
+
+    @Transaction
+    default void voteAndUpdateScore(Vote vote) {
+        createVote(vote);
+        updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? 1 : -1);
+    }
 
 }

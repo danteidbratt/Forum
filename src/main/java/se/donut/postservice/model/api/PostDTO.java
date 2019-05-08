@@ -14,7 +14,6 @@ public class PostDTO extends AbstractDTO {
     private final UUID authorUuid;
     private final String authorName;
     private final String title;
-    private final String link;
     private final String content;
     private final int score;
     private final Direction myVote;
@@ -25,7 +24,6 @@ public class PostDTO extends AbstractDTO {
             UUID authorUuid,
             String authorName,
             String title,
-            String link,
             String content,
             int score,
             Direction myVote) {
@@ -33,7 +31,6 @@ public class PostDTO extends AbstractDTO {
         this.authorUuid = authorUuid;
         this.authorName = authorName;
         this.title = title;
-        this.link = link;
         this.content = content;
         this.score = score;
         this.myVote = myVote;

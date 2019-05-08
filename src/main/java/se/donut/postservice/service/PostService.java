@@ -3,10 +3,7 @@ package se.donut.postservice.service;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
-import se.donut.postservice.model.domain.Forum;
-import se.donut.postservice.model.domain.Post;
-import se.donut.postservice.model.domain.User;
-import se.donut.postservice.model.domain.Vote;
+import se.donut.postservice.model.domain.*;
 import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
@@ -15,7 +12,8 @@ import se.donut.postservice.resource.request.SortType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static se.donut.postservice.exception.ExceptionType.*;
+import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
 
 public class PostService {
 
@@ -39,7 +37,7 @@ public class PostService {
 
         Optional<User> author = userDAO.get(post.getAuthorUuid());
 
-        Optional<Vote> userVote = postDAO.getVote(userUuid, postUuid);
+        Optional<Vote> userVote = userUuid != null ? postDAO.getVote(userUuid, postUuid) : Optional.empty();
 
         return post.toApiModel(
                 author.map(User::getName).orElse(null),
@@ -76,7 +74,7 @@ public class PostService {
         return buildApiModels(posts, SortType.NEW, userUuid);
     }
 
-    public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String link, String content) {
+    public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
         Forum forum = forumDAO.get(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
         UUID postUuid = UUID.randomUUID();
         Post post = new Post(
@@ -86,7 +84,6 @@ public class PostService {
                 0,
                 forum.getUuid(),
                 title,
-                link,
                 new Date()
         );
         postDAO.create(post);
@@ -95,7 +92,7 @@ public class PostService {
 
     public void vote(UUID forumUuid, UUID postUuid, UUID userUuid, Direction direction) {
         Vote vote = new Vote(postUuid, forumUuid, userUuid, direction);
-        postDAO.vote(vote);
+        postDAO.voteAndUpdateScore(vote);
     }
 
     public void deleteVote(UUID userUuid, UUID postUuid) {
@@ -111,13 +108,16 @@ public class PostService {
                 .map(Post::getUuid)
                 .collect(Collectors.toList());
 
-        Map<UUID, Vote> votes = userUuid != null ?
-                postDAO.getVotes(userUuid, postUuids).stream()
-                        .collect(Collectors.toMap(
-                                Vote::getTargetUuid,
-                                x -> x
-                        ))
-                : new HashMap<>();
+        Map<UUID, Vote> myVotes;
+        if (userUuid != null) {
+            myVotes = postDAO.getVotes(userUuid, postUuids).stream()
+                    .collect(Collectors.toMap(
+                            Vote::getTargetUuid,
+                            x -> x
+                    ));
+        } else {
+            myVotes = new HashMap<>();
+        }
 
         List<UUID> authorUuids = posts.stream()
                 .map(Post::getAuthorUuid)
@@ -126,10 +126,11 @@ public class PostService {
         Map<UUID, User> authors = userDAO.get(authorUuids);
 
         return posts.stream()
+                .map(p -> new SortablePost(p, sortType))
                 .sorted(sortType.getComparator())
                 .map(p -> {
                     User author = authors.get(p.getAuthorUuid());
-                    Vote vote = votes.get(p.getUuid());
+                    Vote vote = myVotes.get(p.getUuid());
                     return p.toApiModel(
                             author != null ? author.getName() : null,
                             vote != null ? vote.getDirection() : null

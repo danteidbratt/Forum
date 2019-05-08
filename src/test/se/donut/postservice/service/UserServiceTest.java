@@ -57,7 +57,7 @@ public class UserServiceTest {
 
         // Assert
         ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userDAO, times(1)).createUser(argumentCaptor.capture());
+        verify(userDAO, times(1)).createUserWithPassword(argumentCaptor.capture(), eq(password));
         User user = argumentCaptor.getValue();
         assertEquals("some username", user.getName());
         assertEquals(Integer.valueOf(0), user.getCarma());

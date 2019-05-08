@@ -4,6 +4,7 @@ import se.donut.postservice.exception.ExceptionType;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.ForumDTO;
 import se.donut.postservice.model.domain.Forum;
+import se.donut.postservice.model.domain.SortableForum;
 import se.donut.postservice.model.domain.Subscription;
 import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.postgresql.ForumDAO;
@@ -27,20 +28,19 @@ public class ForumService {
     }
 
     public List<ForumDTO> getAllForums(SortType sortType) {
-        List<Forum> forums = forumDAO.getAll();
-        List<UUID> userUuids = forums.stream()
-                .map(Forum::getAuthorUuid)
-                .collect(Collectors.toList());
-        Map<UUID, User> users = userDAO.get(userUuids);
-        return forums.stream()
-                .sorted(sortType.getComparator())
-                .map(f -> f.toApiModel(users.get(f.getAuthorUuid()).getName()))
-                .collect(Collectors.toList());
+        return getAllForums(sortType, null);
     }
 
-    public List<ForumDTO> getAllForums(UUID userUuid, SortType sortType) {
-        Map<UUID, Subscription> subscriptions = subscriptionDAO.getByUser(userUuid).stream()
-                .collect(Collectors.toMap(Subscription::getForumUuid, s -> s));
+    public List<ForumDTO> getAllForums(SortType sortType, UUID userUuid) {
+        Map<UUID, Subscription> subscriptions;
+
+        if (userUuid != null) {
+            subscriptions = subscriptionDAO.getByUser(userUuid)
+                    .stream()
+                    .collect(Collectors.toMap(Subscription::getForumUuid, s -> s));
+        } else {
+            subscriptions = new HashMap<>();
+        }
 
         List<Forum> forums = forumDAO.getAll();
 
@@ -51,26 +51,16 @@ public class ForumService {
         Map<UUID, User> users = userDAO.get(userUuids);
 
         return forums.stream()
+                .map(f -> new SortableForum(f, sortType))
                 .sorted(sortType.getComparator())
                 .map(f -> f.toApiModel(
                         users.get(f.getAuthorUuid()).getName(),
-                        subscriptions.containsKey(f.getUuid())))
+                        userUuid != null ? subscriptions.containsKey(f.getUuid()) : null))
                 .collect(Collectors.toList());
     }
 
     public List<ForumDTO> getSubscriptions(UUID userUuid, SortType sortType) {
-        Map<UUID, Subscription> subscriptions = subscriptionDAO.getByUser(userUuid).stream()
-                .collect(Collectors.toMap(Subscription::getForumUuid, s -> s));
-
-        if (subscriptions.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<UUID> forumUuids = subscriptions.values().stream()
-                .map(Subscription::getForumUuid)
-                .collect(Collectors.toList());
-
-        List<Forum> forums = forumDAO.get(forumUuids);
+        List<Forum> forums = forumDAO.getSubscriptions(userUuid);
 
         List<UUID> userUuids = forums.stream()
                 .map(Forum::getAuthorUuid)
@@ -79,6 +69,7 @@ public class ForumService {
         Map<UUID, User> users = userDAO.get(userUuids);
 
         return forums.stream()
+                .map(f -> new SortableForum(f, sortType))
                 .sorted(sortType.getComparator())
                 .map(f -> f.toApiModel(users.get(f.getAuthorUuid()).getName(), true))
                 .collect(Collectors.toList());

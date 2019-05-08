@@ -5,10 +5,9 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class CreatePostRequest extends CreateCommentRequest {
+public class CreatePostRequest {
 
     private String title;
-    private String link;
     private String content;
 
 }

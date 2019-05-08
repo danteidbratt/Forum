@@ -19,7 +19,6 @@ public class PostMapper implements RowMapper<Post> {
                 rs.getInt("score"),
                 UUID.fromString(rs.getString("forum_uuid")),
                 rs.getString("title"),
-                rs.getString("link"),
                 Date.from(rs.getTimestamp("created_at").toInstant())
         );
     }

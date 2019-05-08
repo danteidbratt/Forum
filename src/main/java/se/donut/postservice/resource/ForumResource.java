@@ -17,11 +17,11 @@ import java.util.UUID;
 @Path("forums")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ForumGuestResource {
+public class ForumResource {
 
     private final ForumService forumService;
 
-    public ForumGuestResource(ForumService forumService) {
+    public ForumResource(ForumService forumService) {
         this.forumService = forumService;
     }
 
@@ -43,7 +43,7 @@ public class ForumGuestResource {
             @DefaultValue("0") @QueryParam("page") int page,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
-        return forumService.getAllForums(authenticatedUser.getUuid(), sortType);
+        return forumService.getAllForums(sortType, authenticatedUser.getUuid());
     }
 
     @PermitAll

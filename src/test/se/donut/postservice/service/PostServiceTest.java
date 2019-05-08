@@ -42,7 +42,6 @@ public class PostServiceTest {
                     forumUuid,
                     UUID.randomUUID(),
                     "some title",
-                    "www.somelink.com",
                     "some contet"
             );
             fail();

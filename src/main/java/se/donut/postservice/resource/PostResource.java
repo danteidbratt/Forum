@@ -37,7 +37,6 @@ public class PostResource {
                 forumUuid,
                 authenticatedUser.getUuid(),
                 request.getTitle(),
-                request.getLink(),
                 request.getContent()
         );
         return Response.ok(uuid).build();
@@ -47,7 +46,7 @@ public class PostResource {
     @GET
     public List<PostDTO> getPostsByForumAsGuest(
             @PathParam("forumUuid") UUID forumUuid,
-            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+            @DefaultValue("HOT") @QueryParam("sort") SortType sortType
     ) {
         return postService.getByForum(forumUuid, sortType);
     }
@@ -57,7 +56,7 @@ public class PostResource {
     public List<PostDTO> getPostsByForum(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
-            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+            @DefaultValue("HOT") @QueryParam("sort") SortType sortType
     ) {
         return postService.getByForum(forumUuid, sortType, authenticatedUser.getUuid());
     }
@@ -75,13 +74,13 @@ public class PostResource {
     public PostDTO getPost(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("postUuid") UUID postUuid) {
-        return postService.getPost(postUuid);
+        return postService.getPost(postUuid, authenticatedUser.getUuid());
     }
 
     @PermitAll
     @Path("{postUuid}/vote")
     @POST
-    public Response deleteVoteOnPost(
+    public Response voteOnPost(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
             @PathParam("postUuid") UUID postUuid,

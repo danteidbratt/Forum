@@ -13,7 +13,8 @@ import se.donut.postservice.resource.request.SortType;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static se.donut.postservice.exception.ExceptionType.*;
+import static se.donut.postservice.exception.ExceptionType.COMMENT_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
 
 public class CommentService {
 
@@ -49,29 +50,34 @@ public class CommentService {
         return commentUuid;
     }
 
-    public List<CommentDTO> getCommentViews(UUID userUuid, UUID postUuid, SortType sortType) {
-        List<CommentView> commentViews = commentDAO.getCommentViews(postUuid, userUuid, sortType.getColumnName());
-        Map<UUID, List<CommentView>> commentViewMap = commentViews.stream()
+//    public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType) {
+//        return getCommentsByPost(postUuid, sortType, UUID.randomUUID());
+//
+//    }
+//
+//    public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType, UUID userUuid) {
+//        List<CommentBundle> commentViews = commentDAO.getCommentViews(postUuid, userUuid, sortType.getColumnName());
+//        Map<UUID, List<CommentBundle>> commentViewMap = commentViews.stream()
 //                .sorted(sortType.getComparator())
-                .collect(Collectors.groupingBy(CommentView::getParentUuid));
-        Map<UUID, List<CommentDTO>> comments = commentViewMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        x -> x.getValue()
-                                .stream()
-                                .map(CommentView::toApiModel)
-                                .collect(Collectors.toList())
-                ));
-
-        return stackCommentsRecursively(comments, postUuid);
-    }
+//                .collect(Collectors.groupingBy(CommentBundle::getParentUuid));
+//        Map<UUID, List<CommentDTO>> comments = commentViewMap.entrySet()
+//                .stream()
+//                .collect(Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        x -> x.getValue()
+//                                .stream()
+//                                .map(CommentBundle::toApiModel)
+//                                .collect(Collectors.toList())
+//                ));
+//
+//        return stackCommentsRecursively(comments, postUuid);
+//    }
 
     public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType) {
-        return getCommentsByPost(null, postUuid, sortType);
+        return getCommentsByPost( postUuid, sortType, null);
     }
 
-    public List<CommentDTO> getCommentsByPost(UUID userUuid, UUID postUuid, SortType sortType) {
+    public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType, UUID userUuid) {
         List<Comment> comments = commentDAO.getCommentsByPostUuid(postUuid);
 
         List<UUID> authorUuids = comments.stream()
@@ -86,6 +92,7 @@ public class CommentService {
                 : new HashMap<>();
 
         Map<UUID, List<Comment>> commentMap = comments.stream()
+                .map(c -> new SortableComment(c, sortType))
                 .sorted(sortType.getComparator())
                 .collect(Collectors.groupingBy(Comment::getParentUuid));
 

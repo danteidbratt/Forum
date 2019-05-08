@@ -61,7 +61,7 @@ public class App extends Application<AppConfig> {
 
         UserResource userResource = new UserResource(userService, postService);
         PostResource postResource = new PostResource(postService);
-        ForumGuestResource forumResource = new ForumGuestResource(forumService);
+        ForumResource forumResource = new ForumResource(forumService);
         CommentResource commentResource = new CommentResource(commentService);
 
         environment.jersey().register(new AuthDynamicFeature(
