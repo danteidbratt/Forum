@@ -4,6 +4,7 @@ import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.model.domain.*;
+import se.donut.postservice.model.domain.SortablePost;
 import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;

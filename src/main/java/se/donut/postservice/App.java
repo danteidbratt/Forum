@@ -23,7 +23,7 @@ import se.donut.postservice.service.ForumService;
 import se.donut.postservice.service.PostService;
 import se.donut.postservice.service.UserService;
 
-public class App extends Application<AppConfig> {
+public class App extends Application<Config> {
 
     public static void main(String[] args) throws Exception {
         App app = new App();
@@ -36,9 +36,9 @@ public class App extends Application<AppConfig> {
     }
 
     @Override
-    public void run(AppConfig appConfig, Environment environment) throws Exception {
+    public void run(Config config, Environment environment) throws Exception {
         JdbiFactory jdbiFactory = new JdbiFactory();
-        Jdbi jdbi = jdbiFactory.build(environment, appConfig.getDatabase(), "postgresql");
+        Jdbi jdbi = jdbiFactory.build(environment, config.getDatabase(), "postgresql");
 
         jdbi.registerRowMapper(new UserMapper());
         jdbi.registerRowMapper(new ForumMapper());
@@ -81,10 +81,10 @@ public class App extends Application<AppConfig> {
     }
 
     @Override
-    public void initialize(Bootstrap<AppConfig> bootstrap) {
-        bootstrap.addBundle(new MigrationsBundle<AppConfig>() {
-            public PooledDataSourceFactory getDataSourceFactory(AppConfig appConfig) {
-                return appConfig.getDatabase();
+    public void initialize(Bootstrap<Config> bootstrap) {
+        bootstrap.addBundle(new MigrationsBundle<Config>() {
+            public PooledDataSourceFactory getDataSourceFactory(Config config) {
+                return config.getDatabase();
             }
         });
     }

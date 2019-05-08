@@ -37,7 +37,6 @@ CREATE TABLE post (
 	uuid UUID PRIMARY KEY,
 	forum_uuid UUID NOT NULL,
 	title VARCHAR(255) NOT NULL,
-	link VARCHAR(255),
 	FOREIGN KEY (author_uuid) REFERENCES users (uuid),
 	FOREIGN KEY (forum_uuid) REFERENCES forum (uuid)
 ) INHERITS (submission);
@@ -55,8 +54,7 @@ CREATE TABLE subscription (
 	forum_uuid UUID NOT NULL,
 	FOREIGN KEY (forum_uuid) REFERENCES forum (uuid),
 	FOREIGN KEY (user_uuid) REFERENCES users (uuid),
-	PRIMARY KEY (user_uuid, forum_uuid),
-	CONSTRAINT unique_user_forum UNIQUE (user_uuid, forum_uuid)
+	PRIMARY KEY (user_uuid, forum_uuid)
 );
 
 CREATE TABLE vote (

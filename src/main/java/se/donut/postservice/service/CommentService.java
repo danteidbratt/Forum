@@ -5,6 +5,7 @@ import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.domain.*;
+import se.donut.postservice.model.domain.SortableComment;
 import se.donut.postservice.repository.postgresql.CommentDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
@@ -49,29 +50,6 @@ public class CommentService {
         commentDAO.createComment(comment);
         return commentUuid;
     }
-
-//    public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType) {
-//        return getCommentsByPost(postUuid, sortType, UUID.randomUUID());
-//
-//    }
-//
-//    public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType, UUID userUuid) {
-//        List<CommentBundle> commentViews = commentDAO.getCommentViews(postUuid, userUuid, sortType.getColumnName());
-//        Map<UUID, List<CommentBundle>> commentViewMap = commentViews.stream()
-//                .sorted(sortType.getComparator())
-//                .collect(Collectors.groupingBy(CommentBundle::getParentUuid));
-//        Map<UUID, List<CommentDTO>> comments = commentViewMap.entrySet()
-//                .stream()
-//                .collect(Collectors.toMap(
-//                        Map.Entry::getKey,
-//                        x -> x.getValue()
-//                                .stream()
-//                                .map(CommentBundle::toApiModel)
-//                                .collect(Collectors.toList())
-//                ));
-//
-//        return stackCommentsRecursively(comments, postUuid);
-//    }
 
     public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType) {
         return getCommentsByPost( postUuid, sortType, null);
