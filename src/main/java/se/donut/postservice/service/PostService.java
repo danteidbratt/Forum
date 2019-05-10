@@ -76,7 +76,7 @@ public class PostService {
     }
 
     public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
-        Forum forum = forumDAO.get(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
+        Forum forum = forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
         UUID postUuid = UUID.randomUUID();
         Post post = new Post(
                 postUuid,
@@ -138,5 +138,9 @@ public class PostService {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void validatePost(Post post) {
+
     }
 }

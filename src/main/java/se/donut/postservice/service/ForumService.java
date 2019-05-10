@@ -1,6 +1,5 @@
 package se.donut.postservice.service;
 
-import se.donut.postservice.exception.ExceptionType;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.ForumDTO;
 import se.donut.postservice.model.domain.Forum;
@@ -8,23 +7,23 @@ import se.donut.postservice.model.domain.SortableForum;
 import se.donut.postservice.model.domain.Subscription;
 import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.postgresql.ForumDAO;
-import se.donut.postservice.repository.postgresql.SubscriptionDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static se.donut.postservice.exception.ExceptionType.FORUM_NAME_ALREADY_TAKEN;
+import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
+
 public class ForumService {
 
     private final UserDAO userDAO;
     private final ForumDAO forumDAO;
-    private final SubscriptionDAO subscriptionDAO;
 
-    public ForumService(UserDAO userDAO, ForumDAO forumDAO, SubscriptionDAO subscriptionDAO) {
+    public ForumService(UserDAO userDAO, ForumDAO forumDAO) {
         this.userDAO = userDAO;
         this.forumDAO = forumDAO;
-        this.subscriptionDAO = subscriptionDAO;
     }
 
     public List<ForumDTO> getAllForums(SortType sortType) {
@@ -35,14 +34,14 @@ public class ForumService {
         Map<UUID, Subscription> subscriptions;
 
         if (userUuid != null) {
-            subscriptions = subscriptionDAO.getByUser(userUuid)
+            subscriptions = forumDAO.getSubscriptionsByUser(userUuid)
                     .stream()
                     .collect(Collectors.toMap(Subscription::getForumUuid, s -> s));
         } else {
             subscriptions = new HashMap<>();
         }
 
-        List<Forum> forums = forumDAO.getAll();
+        List<Forum> forums = forumDAO.getAllForums();
 
         List<UUID> userUuids = forums.stream()
                 .map(Forum::getAuthorUuid)
@@ -76,6 +75,11 @@ public class ForumService {
     }
 
     public UUID createForum(UUID userUuid, String name, String description) {
+        Optional<Forum> forumWithSameName = forumDAO.getForumByName(name);
+        if (forumWithSameName.isPresent()) {
+            throw new PostServiceException(FORUM_NAME_ALREADY_TAKEN);
+        }
+
         UUID forumUuid = UUID.randomUUID();
         Date now = new Date();
         Forum forum = new Forum(
@@ -90,31 +94,21 @@ public class ForumService {
                 userUuid,
                 forumUuid
         );
-        forumDAO.create(forum);
-        subscriptionDAO.create(subscription);
+        forumDAO.createForum(forum);
+        forumDAO.subscribe(subscription);
 
         return forumUuid;
     }
 
     public void subscribe(UUID userUuid, UUID forumUuid) {
-        forumDAO.get(forumUuid).orElseThrow(() -> new PostServiceException(ExceptionType.FORUM_NOT_FOUND));
+        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
 
-        Optional<Subscription> currentSubscription = subscriptionDAO.getByUserAndForum(userUuid, forumUuid);
+        Subscription subscription = new Subscription(userUuid, forumUuid);
 
-        if (currentSubscription.isPresent()) {
-            return;
-        }
-
-        Subscription subscription = new Subscription(
-                userUuid,
-                forumUuid
-        );
-
-        subscriptionDAO.create(subscription);
+        forumDAO.subscribe(subscription);
     }
 
     public void unsubscribe(UUID userUuid, UUID forumUuid) {
-        Optional<Subscription> currentSubscription = subscriptionDAO.getByUserAndForum(userUuid, forumUuid);
-        currentSubscription.ifPresent(subscriptionDAO::delete);
+        forumDAO.unsubscribe(userUuid, forumUuid);
     }
 }

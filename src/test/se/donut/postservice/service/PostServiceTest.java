@@ -34,7 +34,7 @@ public class PostServiceTest {
     public void shouldNotBeAbleToCreatePostOnNonExistingForum() {
         // Arrange
         UUID forumUuid = UUID.randomUUID();
-        doReturn(Optional.empty()).when(forumAccessor).get(forumUuid);
+        doReturn(Optional.empty()).when(forumAccessor).getForum(forumUuid);
 
         // Act
         try {
@@ -42,7 +42,7 @@ public class PostServiceTest {
                     forumUuid,
                     UUID.randomUUID(),
                     "some title",
-                    "some contet"
+                    "some content"
             );
             fail();
         } catch (PostServiceException e) {

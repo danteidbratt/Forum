@@ -4,6 +4,7 @@ import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.postgresql.UserDAO;
+import se.donut.postservice.util.DataValidator;
 
 import java.util.Date;
 import java.util.Optional;
@@ -28,7 +29,14 @@ public class UserService {
     }
 
     public UUID createUser(String username, String password) {
-        validateNewUser(username, password);
+        Optional<User> userWithSameName = userDAO.get(username);
+
+        DataValidator.validateUsername(username);
+        DataValidator.validatePassword(password);
+
+        if (userWithSameName.isPresent()) {
+            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
+        }
 
         UUID userUuid = UUID.randomUUID();
         User user = new User(
@@ -46,22 +54,6 @@ public class UserService {
                 .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
         int carma = userDAO.getCarma(user.getUuid());
         return user.toApiModel(carma);
-    }
-
-    private void validateNewUser(String username, String password) {
-        userDAO.get(username).ifPresent(d -> {
-            throw new PostServiceException(USERNAME_ALREADY_EXISTS);
-        });
-
-        if (username.length() < 3) {
-            // TODO: fix type
-            throw new PostServiceException(USERNAME_ALREADY_EXISTS);
-        }
-        if (password.length() < 3) {
-            // TODO: fix type
-            throw new PostServiceException(USERNAME_ALREADY_EXISTS);
-        }
-
     }
 
 }

@@ -3,6 +3,7 @@ package se.donut.postservice.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import se.donut.postservice.exception.ExceptionType;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.postgresql.UserDAO;
@@ -12,7 +13,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
-import static se.donut.postservice.exception.ExceptionType.USERNAME_ALREADY_EXISTS;
+import static se.donut.postservice.exception.ExceptionType.*;
 import static se.donut.postservice.model.domain.Role.USER;
 
 
@@ -28,9 +29,29 @@ public class UserServiceTest {
     }
 
     @Test
+    public void shouldNotBeAbleToCreateUserWithWhitespaceInUsername() {
+        testUsernameAndPassword("some username", "password", INVALID_USERNAME);
+    }
+
+    @Test
+    public void shouldNotBeAbleToCreateUserWithShortUsername() {
+        testUsernameAndPassword("Yu", "password", INVALID_USERNAME);
+    }
+
+    @Test
+    public void shouldNotBeAbleToCreateUserWithWhitespaceInPassword() {
+        testUsernameAndPassword("username", "some password", INVALID_PASSWORD);
+    }
+
+    @Test
+    public void shouldNotBeAbleToCreateUserWithShortPassword() {
+        testUsernameAndPassword("username", "pass", INVALID_PASSWORD);
+    }
+
+    @Test
     public void shouldNotBeAbleToCreateUserWhenNameIsTaken() {
         // Arrange
-        String name = "some username";
+        String name = "username";
         String password = "secret";
         User user = mock(User.class);
         doReturn(Optional.of(user)).when(userDAO).get(name);
@@ -41,25 +62,35 @@ public class UserServiceTest {
             fail();
         } catch (PostServiceException e) {
             // Assert
-            assertEquals(USERNAME_ALREADY_EXISTS, e.getExceptionType());
+            assertEquals(USERNAME_ALREADY_TAKEN, e.getExceptionType());
         }
     }
 
     @Test
     public void shouldBeAbleToCreateUser() {
         // Arrange
-        String name = "some username";
+        String username = "username";
         String password = "secret";
-        doReturn(Optional.empty()).when(userDAO).get(name);
+        doReturn(Optional.empty()).when(userDAO).get(username);
 
         // Act
-        userService.createUser(name, password);
+        userService.createUser(username, password);
 
         // Assert
         ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
         verify(userDAO, times(1)).createUserWithPassword(argumentCaptor.capture(), eq(password));
         User user = argumentCaptor.getValue();
-        assertEquals("some username", user.getName());
+        assertEquals(username, user.getName());
         assertEquals(USER, user.getRole());
+    }
+
+    private void testUsernameAndPassword(String username, String password, ExceptionType expectedExceptionType) {
+        try {
+            userService.createUser(username, password);
+            fail();
+        } catch (PostServiceException e) {
+            assertEquals(expectedExceptionType, e.getExceptionType());
+        }
+        verify(userDAO, never()).createUserWithPassword(any(),  any());
     }
 }

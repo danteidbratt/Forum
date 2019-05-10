@@ -51,10 +51,9 @@ public class App extends Application<Config> {
         PostDAO postDAO = jdbi.onDemand(PostDAO.class);
         UserDAO userDAO = jdbi.onDemand(UserDAO.class);
         ForumDAO forumDAO = jdbi.onDemand(ForumDAO.class);
-        SubscriptionDAO subscriptionDAO = jdbi.onDemand(SubscriptionDAO.class);
 
         UserService userService = new UserService(userDAO);
-        ForumService forumService = new ForumService(userDAO, forumDAO, subscriptionDAO);
+        ForumService forumService = new ForumService(userDAO, forumDAO);
         CommentService commentService = new CommentService(commentDAO, postDAO, userDAO);
         PostService postService = new PostService(userDAO, postDAO, forumDAO);
 

@@ -9,7 +9,6 @@ CREATE TABLE users (
 	name VARCHAR(255) UNIQUE NOT NULL,
 	role VARCHAR(255) NOT NULL,
 	created_at TIMESTAMP NOT NULL,
-	carma INTEGER NOT NULL,
 	is_deleted BOOLEAN NOT NULL
 );
 
