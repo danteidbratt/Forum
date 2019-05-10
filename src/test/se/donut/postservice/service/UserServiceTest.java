@@ -60,7 +60,6 @@ public class UserServiceTest {
         verify(userDAO, times(1)).createUserWithPassword(argumentCaptor.capture(), eq(password));
         User user = argumentCaptor.getValue();
         assertEquals("some username", user.getName());
-        assertEquals(Integer.valueOf(0), user.getCarma());
         assertEquals(USER, user.getRole());
     }
 }

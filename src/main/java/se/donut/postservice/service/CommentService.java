@@ -84,11 +84,11 @@ public class CommentService {
                 userUuid,
                 direction
         );
-        commentDAO.vote(vote);
+        commentDAO.voteAndUpdateScore(vote);
     }
 
     public void deleteVote(UUID userUuid, UUID commentUuid) {
-        commentDAO.deleteVote(userUuid, commentUuid);
+        commentDAO.getVote(userUuid, commentUuid).ifPresent(commentDAO::deleteVoteAndUpdateScore);
     }
 
     private void validateParent(UUID postUuid, UUID parentUuid) {

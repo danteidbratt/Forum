@@ -97,8 +97,7 @@ public class PostService {
     }
 
     public void deleteVote(UUID userUuid, UUID postUuid) {
-        Optional<Vote> vote = postDAO.getVote(userUuid, postUuid);
-        vote.ifPresent(postDAO::deleteVoteAndUpdateScore);
+        postDAO.getVote(userUuid, postUuid).ifPresent(postDAO::deleteVoteAndUpdateScore);
     }
 
     private List<PostDTO> buildApiModels(List<Post> posts, SortType sortType, UUID userUuid) {

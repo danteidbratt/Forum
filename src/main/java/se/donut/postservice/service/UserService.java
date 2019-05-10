@@ -23,8 +23,8 @@ public class UserService {
     public UserDTO getUser(UUID userUuid) {
         User user = userDAO.get(userUuid)
                 .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
-
-        return user.toApiModel();
+        int carma = userDAO.getCarma(user.getUuid());
+        return user.toApiModel(carma);
     }
 
     public UUID createUser(String username, String password) {
@@ -34,7 +34,6 @@ public class UserService {
         User user = new User(
                 userUuid,
                 username,
-                0,
                 USER,
                 new Date()
         );
@@ -43,11 +42,10 @@ public class UserService {
     }
 
     public UserDTO login(String username, String password) {
-        Optional<User> user = userDAO.authenticate(username, password);
-        if (user.isPresent()) {
-            return user.get().toApiModel();
-        }
-        throw new PostServiceException(LOGIN_FAILED);
+        User user = userDAO.authenticate(username, password)
+                .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
+        int carma = userDAO.getCarma(user.getUuid());
+        return user.toApiModel(carma);
     }
 
     private void validateNewUser(String username, String password) {

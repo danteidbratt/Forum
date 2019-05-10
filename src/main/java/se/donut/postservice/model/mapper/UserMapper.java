@@ -16,7 +16,6 @@ public class UserMapper implements RowMapper<User> {
         return new User(
                 UUID.fromString(rs.getString("uuid")),
                 rs.getString("name"),
-                rs.getInt("carma"),
                 Role.valueOf(rs.getString("role")),
                 Date.from(rs.getTimestamp("created_at").toInstant())
         );

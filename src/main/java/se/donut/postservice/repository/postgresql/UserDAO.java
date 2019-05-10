@@ -36,10 +36,18 @@ public interface UserDAO {
     @RegisterConstructorMapper(UserMapper.class)
     Map<UUID, User> get(@BindList("uuids") List<UUID> uuids);
 
+    @SqlQuery("SELECT " +
+            "(SUM(c.score) + SUM(p.score)) AS total_score " +
+            "FROM users u " +
+            "INNER JOIN post p ON p.author_uuid = u.uuid " +
+            "INNER JOIN comment c ON c.author_uuid = u.uuid " +
+            "WHERE u.uuid = :userUuid")
+    int getCarma(@Bind("userUuid") UUID userUuid);
+
     @SqlUpdate("INSERT INTO users " +
-            "(uuid, name, role, created_at, carma, is_deleted) " +
+            "(uuid, name, role, created_at, is_deleted) " +
             "VALUES " +
-            "(:uuid, :name, :role, :createdAt, :carma, false)")
+            "(:uuid, :name, :role, :createdAt, false)")
     void createUser(@BindBean User user);
 
     @Transaction

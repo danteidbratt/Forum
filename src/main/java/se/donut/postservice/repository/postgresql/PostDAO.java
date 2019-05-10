@@ -68,14 +68,13 @@ public interface PostDAO {
             "(target_uuid, target_parent_uuid, user_uuid, direction) " +
             "VALUES " +
             "(:targetUuid, :targetParentUuid, :userUuid, :direction) " +
-            "ON CONFLICT (user_uuid, target_uuid) DO UPDATE " +
-            "SET direction = :direction")
-    void createVote(@BindBean Vote vote);
+            "ON CONFLICT DO NOTHING")
+    int createVote(@BindBean Vote vote);
 
     @SqlUpdate("DELETE FROM post_vote " +
             "WHERE user_uuid = :userUuid " +
             "AND target_uuid = :targetUuid")
-    void deleteVote(
+    int deleteVote(
             @BindBean Vote vote
     );
 
@@ -84,14 +83,18 @@ public interface PostDAO {
 
     @Transaction
     default void voteAndUpdateScore(Vote vote) {
-        createVote(vote);
-        updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? 1 : -1);
+        int rowsAffected = createVote(vote);
+        if (rowsAffected == 1) {
+            updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? 1 : -1);
+        }
     }
 
     @Transaction
     default void deleteVoteAndUpdateScore(Vote vote) {
-        deleteVote(vote);
-        updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? 1 : -1);
+        int rowsAffected = deleteVote(vote);
+        if (rowsAffected == 1) {
+            updateScoreOnPost(vote.getTargetUuid(), vote.getDirection().equals(UP) ? -1 : 1);
+        }
     }
 
 }
