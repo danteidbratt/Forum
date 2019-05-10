@@ -9,6 +9,7 @@ import se.donut.postservice.model.domain.User;
 import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
+import se.donut.postservice.util.DataValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -75,6 +76,8 @@ public class ForumService {
     }
 
     public UUID createForum(UUID userUuid, String name, String description) {
+        name = DataValidator.validateForumName(name);
+        description = DataValidator.validateForumDescription(description);
         Optional<Forum> forumWithSameName = forumDAO.getForumByName(name);
         if (forumWithSameName.isPresent()) {
             throw new PostServiceException(FORUM_NAME_ALREADY_TAKEN);

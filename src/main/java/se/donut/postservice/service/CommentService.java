@@ -10,6 +10,7 @@ import se.donut.postservice.repository.postgresql.CommentDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
+import se.donut.postservice.util.DataValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +37,17 @@ public class CommentService {
             UUID authorUuid,
             String content
     ) {
-        validateParent(postUuid, parentUuid);
+        content = DataValidator.validateCommentContent(content);
+        Post post = postDAO.get(postUuid)
+                .orElseThrow(() -> new PostServiceException(POST_NOT_FOUND));
+
+        if (!post.getUuid().equals(parentUuid)) {
+            Comment parentComment = commentDAO.getComment(parentUuid)
+                    .orElseThrow(() -> new PostServiceException(COMMENT_NOT_FOUND));
+            if (!post.getUuid().equals(parentComment.getPostUuid())) {
+                throw new PostServiceException(COMMENT_NOT_FOUND);
+            }
+        }
         UUID commentUuid = UUID.randomUUID();
         Comment comment = new Comment(
                 commentUuid,
@@ -52,7 +63,7 @@ public class CommentService {
     }
 
     public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType) {
-        return getCommentsByPost( postUuid, sortType, null);
+        return getCommentsByPost(postUuid, sortType, null);
     }
 
     public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType, UUID userUuid) {
@@ -89,21 +100,6 @@ public class CommentService {
 
     public void deleteVote(UUID userUuid, UUID commentUuid) {
         commentDAO.getVote(userUuid, commentUuid).ifPresent(commentDAO::deleteVoteAndUpdateScore);
-    }
-
-    private void validateParent(UUID postUuid, UUID parentUuid) {
-        Post post = postDAO.get(postUuid)
-                .orElseThrow(() -> new PostServiceException(POST_NOT_FOUND));
-
-        if (post.getUuid().equals(parentUuid)) {
-            return;
-        }
-        Comment parentComment = commentDAO.getComment(parentUuid)
-                .orElseThrow(() -> new PostServiceException(COMMENT_NOT_FOUND));
-
-        if (!post.getUuid().equals(parentComment.getPostUuid())) {
-            throw new PostServiceException(COMMENT_NOT_FOUND);
-        }
     }
 
     private List<CommentDTO> buildCommentTree(

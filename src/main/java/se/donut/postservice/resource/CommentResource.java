@@ -72,8 +72,6 @@ public class CommentResource {
             @PathParam("commentUuid") UUID commentUuid,
             CreateCommentRequest request
     ) {
-        // TODO: Verify that parent comment is tied to the same post
-
         UUID uuid = commentService.createComment(
                 postUuid,
                 commentUuid,

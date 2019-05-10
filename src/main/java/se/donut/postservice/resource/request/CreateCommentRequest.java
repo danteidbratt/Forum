@@ -1,14 +1,15 @@
 package se.donut.postservice.resource.request;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
 public class CreateCommentRequest {
 
+    @Size(max = 512)
     private String content;
 
 }

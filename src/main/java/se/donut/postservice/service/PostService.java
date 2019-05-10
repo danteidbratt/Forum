@@ -9,6 +9,7 @@ import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
+import se.donut.postservice.util.DataValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -76,14 +77,17 @@ public class PostService {
     }
 
     public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
-        Forum forum = forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
+        title = DataValidator.validatePostTitle(title);
+        content = DataValidator.validatePostContent(content);
+        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
+
         UUID postUuid = UUID.randomUUID();
         Post post = new Post(
                 postUuid,
                 authorUuid,
                 content,
                 0,
-                forum.getUuid(),
+                forumUuid,
                 title,
                 new Date()
         );

@@ -1,52 +1,62 @@
 package se.donut.postservice.util;
 
 import se.donut.postservice.exception.PostServiceException;
-import se.donut.postservice.model.domain.Comment;
-import se.donut.postservice.model.domain.Forum;
-import se.donut.postservice.model.domain.Post;
-import se.donut.postservice.model.domain.User;
 
 import static se.donut.postservice.exception.ExceptionType.*;
 
 public class DataValidator {
 
-    public static void validatePost(Post post) {
-        int titleLength = post.getTitle().length();
-        if (titleLength == 0 || titleLength > 128) {
+    public static String validatePostTitle(String title) {
+        if (title.length() < 3 || title.length() > 128 || title.trim().length() == 0) {
             throw new PostServiceException(INVALID_TITLE);
         }
+        return title.trim();
     }
 
-    public static void validateComment(Comment comment) {
-        int contentLength = comment.getContent().length();
-        if (contentLength == 0 || contentLength > 512) {
+    public static String validatePostContent(String content) {
+        if (content.length() < 1 || content.length() > 512 || content.trim().length() == 0) {
             throw new PostServiceException(INVALID_CONTENT);
         }
+        return content.trim();
     }
 
-    public static void validateForum(Forum forum) {
-        int nameLength = forum.getName().length();
-        if (nameLength < 4 || nameLength > 32) {
+    public static String validateCommentContent(String content) {
+        if (content.length() < 1 || content.length() > 512 || content.trim().length() == 0) {
+            throw new PostServiceException(INVALID_CONTENT);
+        }
+        return content.trim();
+    }
+
+    public static String validateForumName(String name) {
+        if (name.length() < 4 || name.length() > 32 || name.trim().length() == 0) {
             throw new PostServiceException(INVALID_FORUM_NAME);
         }
+        return name.trim();
+    }
+
+    public static String validateForumDescription(String description) {
+        if (description.length() < 4 || description.length() > 256 || description.trim().length() == 0) {
+            throw new PostServiceException(INVALID_FORUM_DESCRIPTION);
+        }
+        return description.trim();
     }
 
     public static void validateUsername(String username) {
-        int nameLength = username.length();
-        if (nameLength < 3 || nameLength > 32) {
+        if (username.length() < 3 || username.length() > 32) {
             throw new PostServiceException(INVALID_USERNAME);
         }
-        if (nameLength != username.replaceAll("\\s*", "").length()) {
+        if (username.length() != username.replaceAll("\\s*", "").length()) {
             throw new PostServiceException(INVALID_USERNAME);
         }
     }
 
     public static void validatePassword(String password) {
-        if (password.length() < 5) {
+        if (password.length() < 5 || password.length() > 256) {
             throw new PostServiceException(INVALID_PASSWORD);
         }
         if (password.length() != password.replaceAll("\\s*", "").length()) {
             throw new PostServiceException(INVALID_PASSWORD);
         }
     }
+
 }
