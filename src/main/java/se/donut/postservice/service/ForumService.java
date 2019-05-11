@@ -76,11 +76,13 @@ public class ForumService {
     }
 
     public UUID createForum(UUID userUuid, String name, String description) {
-        name = DataValidator.validateForumName(name);
+        DataValidator.validateForumName(name);
         description = DataValidator.validateForumDescription(description);
         Optional<Forum> forumWithSameName = forumDAO.getForumByName(name);
         if (forumWithSameName.isPresent()) {
-            throw new PostServiceException(FORUM_NAME_ALREADY_TAKEN);
+            throw new PostServiceException(
+                    FORUM_NAME_ALREADY_TAKEN,
+                    String.format("Forum with name \"%s\" already exists.", name));
         }
 
         UUID forumUuid = UUID.randomUUID();
@@ -104,7 +106,10 @@ public class ForumService {
     }
 
     public void subscribe(UUID userUuid, UUID forumUuid) {
-        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
+        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(
+                FORUM_NOT_FOUND,
+                String.format("Could not find forum with uuid %s.", forumUuid)
+        ));
 
         Subscription subscription = new Subscription(userUuid, forumUuid);
 

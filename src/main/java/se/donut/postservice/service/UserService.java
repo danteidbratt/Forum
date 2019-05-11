@@ -10,7 +10,8 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
-import static se.donut.postservice.exception.ExceptionType.*;
+import static se.donut.postservice.exception.ExceptionType.USERNAME_ALREADY_TAKEN;
+import static se.donut.postservice.exception.ExceptionType.USER_NOT_FOUND;
 import static se.donut.postservice.model.domain.Role.USER;
 
 public class UserService {
@@ -23,7 +24,9 @@ public class UserService {
 
     public UserDTO getUser(UUID userUuid) {
         User user = userDAO.get(userUuid)
-                .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
+                .orElseThrow(() -> new PostServiceException(
+                        USER_NOT_FOUND,
+                        String.format("Could not find user with uuid %s.", userUuid)));
         int carma = userDAO.getCarma(user.getUuid());
         return user.toApiModel(carma);
     }
@@ -35,7 +38,10 @@ public class UserService {
         DataValidator.validatePassword(password);
 
         if (userWithSameName.isPresent()) {
-            throw new PostServiceException(USERNAME_ALREADY_TAKEN);
+            throw new PostServiceException(
+                    USERNAME_ALREADY_TAKEN,
+                    String.format("Username \"%s\" is already taken.", username)
+            );
         }
 
         UUID userUuid = UUID.randomUUID();
@@ -50,10 +56,12 @@ public class UserService {
     }
 
     public UserDTO login(String username, String password) {
-        User user = userDAO.authenticate(username, password)
-                .orElseThrow(() -> new PostServiceException(USER_NOT_FOUND));
-        int carma = userDAO.getCarma(user.getUuid());
-        return user.toApiModel(carma);
+        Optional<User> user = userDAO.authenticate(username, password);
+        if (user.isPresent()) {
+            int carma = userDAO.getCarma(user.get().getUuid());
+            return user.get().toApiModel(carma);
+        }
+        return null;
     }
 
 }

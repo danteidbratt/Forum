@@ -66,12 +66,11 @@ public class App extends Application<Config> {
                 new BasicCredentialAuthFilter.Builder<AuthenticatedUser>()
                         .setAuthenticator(new UserAuthenticator(userService))
                         .setAuthorizer(new UserAuthorizer())
-                        .setRealm("SUPER SECRET STUFF")
+                        .setRealm("authentication")
                         .buildAuthFilter()));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(AuthenticatedUser.class));
 
-        environment.jersey().register(new AuthResource(userService));
         environment.jersey().register(userResource);
         environment.jersey().register(postResource);
         environment.jersey().register(forumResource);

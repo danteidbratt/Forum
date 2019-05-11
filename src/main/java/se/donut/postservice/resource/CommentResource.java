@@ -9,6 +9,7 @@ import se.donut.postservice.resource.request.VoteRequest;
 import se.donut.postservice.service.CommentService;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -70,7 +71,7 @@ public class CommentResource {
             @PathParam("forumUuid") UUID forumUuid,
             @PathParam("postUuid") UUID postUuid,
             @PathParam("commentUuid") UUID commentUuid,
-            CreateCommentRequest request
+            @Valid CreateCommentRequest request
     ) {
         UUID uuid = commentService.createComment(
                 postUuid,
@@ -88,7 +89,7 @@ public class CommentResource {
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("postUuid") UUID postUuid,
             @PathParam("commentUuid") UUID commentUuid,
-            VoteRequest voteRequest
+            @Valid VoteRequest voteRequest
     ) {
         commentService.vote(
                 authenticatedUser.getUuid(),
@@ -103,8 +104,7 @@ public class CommentResource {
     @DELETE
     public void deleteVoteOnComment(
             @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("commentUuid") UUID commentUuid,
-            VoteRequest voteRequest
+            @PathParam("commentUuid") UUID commentUuid
     ) {
         commentService.deleteVote(authenticatedUser.getUuid(), commentUuid);
     }

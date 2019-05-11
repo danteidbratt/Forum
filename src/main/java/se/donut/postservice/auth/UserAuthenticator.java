@@ -17,7 +17,7 @@ public class UserAuthenticator implements Authenticator<BasicCredentials, Authen
     }
 
     @Override
-    public Optional<AuthenticatedUser> authenticate(BasicCredentials credentials) throws AuthenticationException {
+    public Optional<AuthenticatedUser> authenticate(BasicCredentials credentials) {
         String username = credentials.getUsername();
         String password = credentials.getPassword();
         UserDTO user = userService.login(username, password);

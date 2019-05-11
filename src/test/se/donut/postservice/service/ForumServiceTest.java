@@ -14,10 +14,8 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static se.donut.postservice.exception.ExceptionType.FORUM_NAME_ALREADY_TAKEN;
-import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.*;
 
 public class ForumServiceTest {
 
@@ -35,8 +33,8 @@ public class ForumServiceTest {
     @Test
     public void shouldNotBeAbleToCreateForumWithDuplicateName() {
         // Arrange
-        String forumName = "some name";
-        when(forumDAO.getForumByName(eq(forumName))).thenReturn(Optional.of(mock(Forum.class)));
+        String forumName = "worldNews";
+        when(forumDAO.getForumByName(forumName)).thenReturn(Optional.of(mock(Forum.class)));
 
         // Act
         try {
@@ -51,12 +49,48 @@ public class ForumServiceTest {
     }
 
     @Test
+    public void shouldNotBeAbleToCreateForumWithNonAlphabeticCharactersInName() {
+        // Arrange
+        String forumName = "worldNews2";
+        when(forumDAO.getForumByName(forumName)).thenReturn(Optional.of(mock(Forum.class)));
+
+        // Act
+        try {
+            forumService.createForum(UUID.randomUUID(), forumName, "some description");
+            fail();
+        } catch (PostServiceException e) {
+            assertEquals(INVALID_FORUM_NAME, e.getExceptionType());
+        }
+
+        // Assert
+        verify(forumDAO, never()).createForum(any());
+    }
+
+    @Test
+    public void shouldNotBeAbleToCreateForumWithWhitespaceInName() {
+        // Arrange
+        String forumName = "world news";
+        when(forumDAO.getForumByName(forumName)).thenReturn(Optional.of(mock(Forum.class)));
+
+        // Act
+        try {
+            forumService.createForum(UUID.randomUUID(), forumName, "some description");
+            fail();
+        } catch (PostServiceException e) {
+            assertEquals(INVALID_FORUM_NAME, e.getExceptionType());
+        }
+
+        // Assert
+        verify(forumDAO, never()).createForum(any());
+    }
+
+    @Test
     public void authorShouldBeSubscribedToForumAfterCreation() {
         // Arrange
         UUID userUuid = UUID.randomUUID();
 
         // Act
-        forumService.createForum(userUuid, "some name", "some description");
+        forumService.createForum(userUuid, "worldNews", "some description");
 
         // Assert
         ArgumentCaptor<Forum> forumArgumentCaptor = ArgumentCaptor.forClass(Forum.class);

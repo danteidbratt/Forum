@@ -1,23 +1,22 @@
 package se.donut.postservice.resource.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+
+@Getter
+@Setter
 public class CreateUserRequest {
 
     @NotNull
-    @Size(max = 32)
+    @Size(min = 3, max = 32)
     private String username;
 
     @NotNull
-    @Size(max = 256)
+    @Size(min = 3, max = 256)
     private String password;
 
 }

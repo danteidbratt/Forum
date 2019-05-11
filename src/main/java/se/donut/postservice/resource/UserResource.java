@@ -9,6 +9,7 @@ import se.donut.postservice.service.PostService;
 import se.donut.postservice.service.UserService;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -39,10 +40,9 @@ public class UserResource {
     }
 
     @POST
-    public Response createUser(CreateUserRequest request) {
+    public Response createUser(@Valid CreateUserRequest request) {
         UUID uuid = userService.createUser(request.getUsername(), request.getPassword());
         return Response.ok(uuid).build();
-//        return Response.created(uriBuilder.path(uuid.toString()).build()).build();
     }
 
     @Path("{userUuid}/posts/guest")

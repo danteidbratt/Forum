@@ -9,6 +9,7 @@ import se.donut.postservice.resource.request.VoteRequest;
 import se.donut.postservice.service.PostService;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -31,7 +32,7 @@ public class PostResource {
     public Response createPost(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
-            CreatePostRequest request
+            @Valid CreatePostRequest request
     ) {
         UUID uuid = postService.createPost(
                 forumUuid,
@@ -84,7 +85,7 @@ public class PostResource {
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
             @PathParam("postUuid") UUID postUuid,
-            VoteRequest voteRequest
+            @Valid VoteRequest voteRequest
     ) {
         postService.vote(forumUuid, postUuid, authenticatedUser.getUuid(), voteRequest.getDirection());
         return Response.ok().build();

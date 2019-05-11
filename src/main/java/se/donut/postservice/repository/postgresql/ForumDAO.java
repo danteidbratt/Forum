@@ -41,10 +41,10 @@ public interface ForumDAO {
     void deleteForum(@BindBean Forum forum);
 
     @SqlUpdate("UPDATE forum SET score = score + 1 WHERE uuid = :forumUuid")
-    int addForumScore(@Bind("forumuuid") UUID forumUuid);
+    int addForumScore(@Bind("forumUuid") UUID forumUuid);
 
     @SqlUpdate("UPDATE forum SET score = score - 1 WHERE uuid = :forumUuid")
-    int subtractForumScore(@Bind("forumuuid") UUID forumUuid);
+    int subtractForumScore(@Bind("forumUuid") UUID forumUuid);
 
     @SqlQuery("SELECT * FROM subscription " +
             "WHERE user_uuid = :userUuid AND forum_uuid = :forumUuid")
@@ -89,7 +89,7 @@ public interface ForumDAO {
     default void unsubscribe(UUID userUuid, UUID forumUuid) {
         int rowsAffected = deleteSubscription(userUuid, forumUuid);
         if (rowsAffected == 1) {
-            addForumScore(forumUuid);
+            subtractForumScore(forumUuid);
         }
     }
 

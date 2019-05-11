@@ -39,13 +39,24 @@ public class CommentService {
     ) {
         content = DataValidator.validateCommentContent(content);
         Post post = postDAO.get(postUuid)
-                .orElseThrow(() -> new PostServiceException(POST_NOT_FOUND));
+                .orElseThrow(() -> new PostServiceException(
+                        POST_NOT_FOUND,
+                        String.format("Could not find post with uuid %s.", postUuid))
+                );
 
         if (!post.getUuid().equals(parentUuid)) {
             Comment parentComment = commentDAO.getComment(parentUuid)
-                    .orElseThrow(() -> new PostServiceException(COMMENT_NOT_FOUND));
+                    .orElseThrow(() -> new PostServiceException(
+                            COMMENT_NOT_FOUND,
+                            String.format("Could not find parent comment with uuid %s.", parentUuid)
+                    ));
             if (!post.getUuid().equals(parentComment.getPostUuid())) {
-                throw new PostServiceException(COMMENT_NOT_FOUND);
+                throw new PostServiceException(
+                        COMMENT_NOT_FOUND,
+                        String.format("Parent comment with uuid %s does not belong to post with uuid %s.",
+                                parentUuid, postUuid
+                        )
+                );
             }
         }
         UUID commentUuid = UUID.randomUUID();

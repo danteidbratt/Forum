@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 public class CreatePostRequest {
 
     @NotNull
-    @Size(max = 128)
+    @Size(min = 1, max = 128)
     private String title;
 
     @NotNull

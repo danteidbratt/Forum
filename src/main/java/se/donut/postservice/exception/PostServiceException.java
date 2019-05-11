@@ -6,8 +6,8 @@ public class PostServiceException extends WebApplicationException {
 
     private final ExceptionType exceptionType;
 
-    public PostServiceException(ExceptionType exceptionType) {
-        super(exceptionType.toString(), exceptionType.getStatus());
+    public PostServiceException(ExceptionType exceptionType, String message) {
+        super(message, exceptionType.getStatus());
         this.exceptionType = exceptionType;
     }
 

@@ -3,8 +3,10 @@ package se.donut.postservice.service;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
-import se.donut.postservice.model.domain.*;
+import se.donut.postservice.model.domain.Post;
 import se.donut.postservice.model.domain.SortablePost;
+import se.donut.postservice.model.domain.User;
+import se.donut.postservice.model.domain.Vote;
 import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
@@ -35,7 +37,10 @@ public class PostService {
 
     public PostDTO getPost(UUID postUuid, UUID userUuid) {
         Post post = postDAO.get(postUuid)
-                .orElseThrow(() -> new PostServiceException(POST_NOT_FOUND));
+                .orElseThrow(() -> new PostServiceException(
+                        POST_NOT_FOUND,
+                        String.format("Could not find post with uuid %s.", postUuid)
+                ));
 
         Optional<User> author = userDAO.get(post.getAuthorUuid());
 
@@ -79,7 +84,9 @@ public class PostService {
     public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
         title = DataValidator.validatePostTitle(title);
         content = DataValidator.validatePostContent(content);
-        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(FORUM_NOT_FOUND));
+        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(
+                FORUM_NOT_FOUND,
+                String.format("Could not find forum with uuid %s.", forumUuid)));
 
         UUID postUuid = UUID.randomUUID();
         Post post = new Post(
@@ -142,9 +149,5 @@ public class PostService {
                     );
                 })
                 .collect(Collectors.toList());
-    }
-
-    private void validatePost(Post post) {
-
     }
 }

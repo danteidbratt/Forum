@@ -8,6 +8,7 @@ import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.service.ForumService;
 
 import javax.annotation.security.PermitAll;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -50,7 +51,7 @@ public class ForumResource {
     @POST
     public UUID createForum(
             @Auth AuthenticatedUser user,
-            CreateForumRequest request
+            @Valid CreateForumRequest request
     ) {
         return forumService.createForum(
                 user.getUuid(),
