@@ -49,27 +49,9 @@ public class ForumServiceTest {
     }
 
     @Test
-    public void shouldNotBeAbleToCreateForumWithNonAlphabeticCharactersInName() {
+    public void shouldNotBeAbleToCreateForumWithNonAlphanumericCharacterInName() {
         // Arrange
-        String forumName = "worldNews2";
-        when(forumDAO.getForumByName(forumName)).thenReturn(Optional.of(mock(Forum.class)));
-
-        // Act
-        try {
-            forumService.createForum(UUID.randomUUID(), forumName, "some description");
-            fail();
-        } catch (PostServiceException e) {
-            assertEquals(INVALID_FORUM_NAME, e.getExceptionType());
-        }
-
-        // Assert
-        verify(forumDAO, never()).createForum(any());
-    }
-
-    @Test
-    public void shouldNotBeAbleToCreateForumWithWhitespaceInName() {
-        // Arrange
-        String forumName = "world news";
+        String forumName = "world news 2";
         when(forumDAO.getForumByName(forumName)).thenReturn(Optional.of(mock(Forum.class)));
 
         // Act
@@ -90,7 +72,7 @@ public class ForumServiceTest {
         UUID userUuid = UUID.randomUUID();
 
         // Act
-        forumService.createForum(userUuid, "worldNews", "some description");
+        forumService.createForum(userUuid, "worldNews1", "some description");
 
         // Assert
         ArgumentCaptor<Forum> forumArgumentCaptor = ArgumentCaptor.forClass(Forum.class);

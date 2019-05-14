@@ -9,19 +9,31 @@ import static java.lang.Math.*;
 
 public final class Ranking {
 
-    private static final long earliestPossibleTimestamp = 1557187200;
-    private static final double timeInfluence = Duration.ofMinutes(5).getSeconds();
+    private static final long EARLIEST_POSSIBLE_TIMESTAMP = 1557187200;
+    private static final double TIME_THRESHOLD = Duration.ofMinutes(5).getSeconds();
 
-    private static long epochSeconds(Date date) {
-        return (date.getTime() - new Date(0).getTime()) / 1000;
+    /**
+     * @param date The date at which the submission was created.
+     * @return The number of seconds that have
+     * passed since the beginning of this service.
+     */
+    private static long calculateSeconds(Date date) {
+        return (date.getTime() / 1000) - EARLIEST_POSSIBLE_TIMESTAMP;
     }
 
+    /**
+     *
+     * @param submission The submission that heat
+     *                   value will be calculated from.
+     * @return The heat value by which submissions
+     * may be sorted according to the Hot sorting algorithm.
+     */
     public static double calculateHeat(Submission submission) {
-        long seconds = epochSeconds(submission.getCreatedAt()) - earliestPossibleTimestamp;
+        long seconds = calculateSeconds(submission.getCreatedAt());
         int score = submission.getScore();
         double order = log10(max(abs(score), 1));
         int sign = Integer.compare(score, 0);
-        return sign * order + seconds / timeInfluence;
+        return sign * order + seconds / TIME_THRESHOLD;
     }
 
 }

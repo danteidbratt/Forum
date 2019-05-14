@@ -40,7 +40,7 @@ public class DataValidator {
     }
 
     public static void validateForumName(String name) {
-        if (!name.matches("\\A[A-Za-z]+\\z")) {
+        if (!name.matches("\\A[A-Za-z0-9]+\\z")) {
             throw new PostServiceException(
                     INVALID_FORUM_NAME,
                     "Forum name may only contain alphabetic letters."
