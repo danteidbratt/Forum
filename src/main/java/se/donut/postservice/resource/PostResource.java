@@ -135,4 +135,14 @@ public class PostResource {
         return postService.getBySubscriptions(authenticatedUser.getUuid(), sortType);
     }
 
+    @PermitAll
+    @Path("likes")
+    @GET
+    public List<PostDTO> getLikeDPosts(
+            @Auth AuthenticatedUser authenticatedUser,
+            @DefaultValue("NEW") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getByLikes(authenticatedUser.getUuid(), sortType);
+    }
+
 }

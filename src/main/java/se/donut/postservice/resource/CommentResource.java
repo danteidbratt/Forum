@@ -3,7 +3,6 @@ package se.donut.postservice.resource;
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.CommentDTO;
-import se.donut.postservice.resource.request.CreateCommentRequest;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.resource.request.VoteRequest;
 import se.donut.postservice.service.CommentService;
@@ -12,7 +11,6 @@ import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,5 +48,15 @@ public class CommentResource {
             @PathParam("commentUuid") UUID commentUuid
     ) {
         commentService.deleteVote(authenticatedUser.getUuid(), commentUuid);
+    }
+
+    @PermitAll
+    @Path("likes")
+    @GET
+    public List<CommentDTO> getLikeComments(
+            @Auth AuthenticatedUser authenticatedUser,
+            @DefaultValue("NEW") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getByLikes(authenticatedUser.getUuid(), sortType);
     }
 }

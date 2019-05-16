@@ -61,24 +61,18 @@ public class PostService {
         return buildApiModels(posts, sortType, userUuid);
     }
 
-    public List<PostDTO> getByAuthor(UUID authorUuid) {
-        return getByAuthor(authorUuid, null);
+    public List<PostDTO> getByAuthor(UUID authorUuid, SortType sortType) {
+        return getByAuthor(authorUuid, sortType,null);
     }
 
-    public List<PostDTO> getByAuthor(UUID authorUuid, UUID userUuid) {
+    public List<PostDTO> getByAuthor(UUID authorUuid, SortType sortType, UUID userUuid) {
         List<Post> posts = postDAO.getByAuthor(authorUuid);
-        return buildApiModels(posts, SortType.NEW, userUuid);
+        return buildApiModels(posts, sortType, userUuid);
     }
 
-    public List<PostDTO> getLiked(UUID likerUuid) {
-        List<Post> posts = postDAO.getLiked(likerUuid);
-        return buildApiModels(posts, SortType.NEW, null);
-
-    }
-
-    public List<PostDTO> getLiked(UUID likerUuid, UUID userUuid) {
-        List<Post> posts = postDAO.getLiked(likerUuid);
-        return buildApiModels(posts, SortType.NEW, userUuid);
+    public List<PostDTO> getByLikes(UUID userUuid, SortType sortType) {
+        List<Post> posts = postDAO.getByLikes(userUuid);
+        return buildApiModels(posts, sortType, userUuid);
     }
 
     public List<PostDTO> getBySubscriptions(UUID userUuid, SortType sortType) {
@@ -137,12 +131,12 @@ public class PostService {
                 .stream()
                 .collect(Collectors.toMap(AbstractEntity::getUuid, f -> f));
 
-        List<UUID> postUuids = posts.stream()
-                .map(Post::getUuid)
-                .collect(Collectors.toList());
+//        List<UUID> postUuids = posts.stream()
+//                .map(Post::getUuid)
+//                .collect(Collectors.toList());
 
         Map<UUID, Vote> myVotes = userUuid != null ?
-                postDAO.getVotes(userUuid, postUuids).stream()
+                postDAO.getVotes(userUuid, forumUuids).stream()
                         .collect(Collectors.toMap(
                                 Vote::getTargetUuid,
                                 x -> x

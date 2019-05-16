@@ -2,9 +2,12 @@ package se.donut.postservice.resource;
 
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
+import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.resource.request.CreateUserRequest;
+import se.donut.postservice.resource.request.SortType;
+import se.donut.postservice.service.CommentService;
 import se.donut.postservice.service.PostService;
 import se.donut.postservice.service.UserService;
 
@@ -13,7 +16,6 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,10 +26,12 @@ public class UserResource {
 
     private final UserService userService;
     private final PostService postService;
+    private final CommentService commentService;
 
-    public UserResource(UserService userService, PostService postService) {
+    public UserResource(UserService userService, PostService postService, CommentService commentService) {
         this.userService = userService;
         this.postService = postService;
+        this.commentService = commentService;
     }
 
     @Path("{userUuid}")
@@ -46,39 +50,42 @@ public class UserResource {
 
     @Path("{userUuid}/posts/guest")
     @GET
-    public List<PostDTO> getPostsAsGuest(
-            @PathParam("userUuid") UUID userUuid
+    public List<PostDTO> getPostsByAuthorAsGuest(
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("New") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getByAuthor(userUuid);
+        return postService.getByAuthor(userUuid, sortType);
     }
 
     @PermitAll
     @Path("{userUuid}/posts")
     @GET
-    public List<PostDTO> getPosts(
+    public List<PostDTO> getPostsByAuthor(
             @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("userUuid") UUID userUuid
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("New") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getByAuthor(userUuid, authenticatedUser.getUuid());
+        return postService.getByAuthor(userUuid, sortType, authenticatedUser.getUuid());
     }
 
-    @Path("{userUuid}/likes/guest")
+    @Path("{userUuid}/comments/guest")
     @GET
-    public List<PostDTO> getLikesAsGuest(
-            @PathParam("userUuid") UUID userUuid
+    public List<CommentDTO> getCommentsByAuthorAsGuest(
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("New") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getLiked(userUuid);
+        return commentService.getCommentsByAuthor(userUuid, sortType);
     }
 
     @PermitAll
-    @Path("{userUuid}/likes")
+    @Path("{userUuid}/comments")
     @GET
-    public List<PostDTO> getLikes(
+    public List<CommentDTO> getCommentsByAuthor(
             @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("userUuid") UUID userUuid
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("New") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getLiked(userUuid, authenticatedUser.getUuid());
+        return commentService.getCommentsByAuthor(userUuid, sortType, authenticatedUser.getUuid());
     }
-
 
 }

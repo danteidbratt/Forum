@@ -11,7 +11,6 @@ import se.donut.postservice.model.domain.Post;
 import se.donut.postservice.repository.postgresql.CommentDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
-import se.donut.postservice.resource.request.SortType;
 
 import java.time.Instant;
 import java.util.*;
@@ -42,7 +41,7 @@ public class CommentServiceTest {
         UUID postUuid = UUID.randomUUID();
         int numberOfComments = 10;
         List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
-        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
+        when(commentDAO.getCommentsByPost(postUuid)).thenReturn(comments);
 
         // Act
         List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, TOP);
@@ -62,7 +61,7 @@ public class CommentServiceTest {
         UUID postUuid = UUID.randomUUID();
         int numberOfComments = 10;
         List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
-        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
+        when(commentDAO.getCommentsByPost(postUuid)).thenReturn(comments);
 
         // Act
         List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, NEW);
@@ -85,7 +84,7 @@ public class CommentServiceTest {
         Comment comment2 = generateComment(postUuid, postUuid, 50, now.minusMinutes(3).toDate());
         Comment comment3 = generateComment(postUuid, postUuid, 10, now.minusMinutes(0).toDate());
         List<Comment> comments = Arrays.asList(comment1, comment2, comment3);
-        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
+        when(commentDAO.getCommentsByPost(postUuid)).thenReturn(comments);
 
         List<CommentDTO> commentDTOS = commentService.getCommentsByPost(postUuid, HOT, userUuid);
 
@@ -105,7 +104,7 @@ public class CommentServiceTest {
         Comment comment01 = generateComment(postUuid, comment0.getUuid(), 1, now);
         Comment comment1 = generateComment(postUuid, postUuid, 1, now);
         List<Comment> comments = Arrays.asList(comment0, comment00, comment000, comment01, comment1);
-        when(commentDAO.getCommentsByPostUuid(postUuid)).thenReturn(comments);
+        when(commentDAO.getCommentsByPost(postUuid)).thenReturn(comments);
 
         // Act
         List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, TOP);

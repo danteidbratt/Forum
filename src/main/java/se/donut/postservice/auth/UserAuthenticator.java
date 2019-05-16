@@ -1,6 +1,5 @@
 package se.donut.postservice.auth;
 
-import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 import io.dropwizard.auth.basic.BasicCredentials;
 import se.donut.postservice.model.api.UserDTO;

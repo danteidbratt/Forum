@@ -5,7 +5,7 @@ import se.donut.postservice.model.Sortable;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.Ranking;
 
-import static se.donut.postservice.resource.request.SortType.*;
+import static se.donut.postservice.resource.request.SortType.HOT;
 
 @Getter
 public class SortableForum extends Forum implements Sortable {

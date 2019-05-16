@@ -48,12 +48,20 @@ public interface PostDAO {
             "WHERE p.forum_uuid = :forumUuid AND p.is_deleted = false")
     List<Post> getByForum(@Bind("forumUuid") UUID forumUuid);
 
-    @SqlQuery("SELECT * FROM post_vote " +
-            "WHERE user_uuid = :userUuid AND target_uuid IN (<postUuids>)")
+    @SqlQuery("SELECT v.* FROM post_vote v " +
+            "INNER JOIN post p ON p.uuid = v.target_uuid " +
+            "WHERE v.user_uuid = :userUuid " +
+            "AND p.forum_uuid IN (<forumUuids>)")
     List<Vote> getVotes(
             @Bind("userUuid") UUID userUuid,
-            @BindList("postUuids") List<UUID> postUuids
+            @BindList("forumUuids") List<UUID> forumUuids
     );
+//    @SqlQuery("SELECT * FROM post_vote " +
+//            "WHERE user_uuid = :userUuid AND target_uuid IN (<postUuids>)")
+//    List<Vote> getVotes(
+//            @Bind("userUuid") UUID userUuid,
+//            @BindList("postUuids") List<UUID> postUuids
+//    );
 
     @SqlQuery("SELECT * FROM post_vote " +
             "WHERE user_uuid = :userUuid AND target_uuid = :postUuid")
@@ -71,7 +79,7 @@ public interface PostDAO {
             "INNER JOIN post_vote v ON v.target_uuid = p.uuid " +
             "AND v.direction = 'UP' " +
             "WHERE v.user_uuid = :userUuid")
-    List<Post> getLiked(@Bind("userUuid") UUID userUuid);
+    List<Post> getByLikes(@Bind("userUuid") UUID userUuid);
 
     @SqlUpdate("INSERT INTO post_vote " +
             "(target_uuid, user_uuid, direction) " +

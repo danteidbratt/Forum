@@ -20,7 +20,10 @@ import se.donut.postservice.repository.postgresql.CommentDAO;
 import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
-import se.donut.postservice.resource.*;
+import se.donut.postservice.resource.CommentResource;
+import se.donut.postservice.resource.ForumResource;
+import se.donut.postservice.resource.PostResource;
+import se.donut.postservice.resource.UserResource;
 import se.donut.postservice.service.CommentService;
 import se.donut.postservice.service.ForumService;
 import se.donut.postservice.service.PostService;
@@ -60,7 +63,7 @@ public class App extends Application<Config> {
         CommentService commentService = new CommentService(commentDAO, postDAO, userDAO);
         PostService postService = new PostService(userDAO, postDAO, forumDAO);
 
-        UserResource userResource = new UserResource(userService, postService);
+        UserResource userResource = new UserResource(userService, postService, commentService);
         PostResource postResource = new PostResource(postService, commentService);
         ForumResource forumResource = new ForumResource(forumService, postService);
         CommentResource commentResource = new CommentResource(commentService);
