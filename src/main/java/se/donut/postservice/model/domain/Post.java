@@ -27,10 +27,12 @@ public class Post extends Submission {
         this.title = title;
     }
 
-    public PostDTO toApiModel(String authorName, Direction direction) {
+    public PostDTO toApiModel(String forumName, String authorName, Direction direction) {
         return new PostDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
+                this.getForumUuid(),
+                forumName,
                 this.getAuthorUuid(),
                 authorName,
                 this.getTitle(),

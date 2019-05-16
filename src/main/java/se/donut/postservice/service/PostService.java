@@ -3,10 +3,7 @@ package se.donut.postservice.service;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
-import se.donut.postservice.model.domain.Post;
-import se.donut.postservice.model.domain.SortablePost;
-import se.donut.postservice.model.domain.User;
-import se.donut.postservice.model.domain.Vote;
+import se.donut.postservice.model.domain.*;
 import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
@@ -46,7 +43,10 @@ public class PostService {
 
         Optional<Vote> userVote = userUuid != null ? postDAO.getVote(userUuid, postUuid) : Optional.empty();
 
+        Optional<Forum> forum = forumDAO.getForum(post.getForumUuid());
+
         return post.toApiModel(
+                forum.map(Forum::getName).orElse(null),
                 author.map(User::getName).orElse(null),
                 userVote.map(Vote::getDirection).orElse(null)
         );
@@ -81,6 +81,20 @@ public class PostService {
         return buildApiModels(posts, SortType.NEW, userUuid);
     }
 
+    public List<PostDTO> getBySubscriptions(UUID userUuid, SortType sortType) {
+        List<Post> posts = postDAO.getBySubscriptions(userUuid);
+        return buildApiModels(posts, sortType, userUuid);
+    }
+
+    public List<PostDTO> getAll(SortType sortType) {
+        return getAll(sortType, null);
+    }
+
+    public List<PostDTO> getAll(SortType sortType, UUID userUuid) {
+        List<Post> posts = postDAO.getAll();
+        return buildApiModels(posts,  sortType, userUuid);
+    }
+
     public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
         title = DataValidator.validatePostTitle(title);
         content = DataValidator.validatePostContent(content);
@@ -102,8 +116,8 @@ public class PostService {
         return postUuid;
     }
 
-    public void vote(UUID forumUuid, UUID postUuid, UUID userUuid, Direction direction) {
-        Vote vote = new Vote(postUuid, forumUuid, userUuid, direction);
+    public void vote(UUID postUuid, UUID userUuid, Direction direction) {
+        Vote vote = new Vote(postUuid, userUuid, direction);
         postDAO.voteAndUpdateScore(vote);
     }
 
@@ -116,20 +130,24 @@ public class PostService {
             return new ArrayList<>();
         }
 
+        List<UUID> forumUuids = posts.stream()
+                .map(Post::getForumUuid)
+                .collect(Collectors.toList());
+        Map<UUID, Forum> forums = forumDAO.getForums(forumUuids)
+                .stream()
+                .collect(Collectors.toMap(AbstractEntity::getUuid, f -> f));
+
         List<UUID> postUuids = posts.stream()
                 .map(Post::getUuid)
                 .collect(Collectors.toList());
 
-        Map<UUID, Vote> myVotes;
-        if (userUuid != null) {
-            myVotes = postDAO.getVotes(userUuid, postUuids).stream()
-                    .collect(Collectors.toMap(
-                            Vote::getTargetUuid,
-                            x -> x
-                    ));
-        } else {
-            myVotes = new HashMap<>();
-        }
+        Map<UUID, Vote> myVotes = userUuid != null ?
+                postDAO.getVotes(userUuid, postUuids).stream()
+                        .collect(Collectors.toMap(
+                                Vote::getTargetUuid,
+                                x -> x
+                        ))
+                : new HashMap<>();
 
         List<UUID> authorUuids = posts.stream()
                 .map(Post::getAuthorUuid)
@@ -144,6 +162,7 @@ public class PostService {
                     User author = authors.get(p.getAuthorUuid());
                     Vote vote = myVotes.get(p.getUuid());
                     return p.toApiModel(
+                            forums.get(p.getForumUuid()).getName(),
                             author != null ? author.getName() : null,
                             vote != null ? vote.getDirection() : null
                     );

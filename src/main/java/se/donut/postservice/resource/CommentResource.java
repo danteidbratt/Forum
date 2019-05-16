@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Path("forums/{forumUuid}/posts/{postUuid}/comments")
+@Path("comments")
 public class CommentResource {
 
     private final CommentService commentService;
@@ -28,72 +28,15 @@ public class CommentResource {
     }
 
     @PermitAll
-    @POST
-    public Response commentOnPost(
-            @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("forumUuid") UUID forumUuid,
-            @PathParam("postUuid") UUID postUuid,
-            CreateCommentRequest request
-    ) {
-        UUID uuid = commentService.createComment(
-                postUuid,
-                postUuid,
-                authenticatedUser.getUuid(),
-                request.getContent()
-        );
-        return Response.ok(uuid).build();
-    }
-
-    @Path("guest")
-    @GET
-    public List<CommentDTO> getCommentsByPostAsGuest(
-            @PathParam("postUuid") UUID postUuid,
-            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
-    ) {
-        return commentService.getCommentsByPost(postUuid, sortType);
-    }
-
-    @PermitAll
-    @GET
-    public List<CommentDTO> getCommentsByPost(
-            @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("postUuid") UUID postUuid,
-            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
-    ) {
-        return commentService.getCommentsByPost(postUuid, sortType, authenticatedUser.getUuid());
-    }
-
-    @PermitAll
-    @Path("{commentUuid}")
-    @POST
-    public Response commentOnComment(
-            @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("forumUuid") UUID forumUuid,
-            @PathParam("postUuid") UUID postUuid,
-            @PathParam("commentUuid") UUID commentUuid,
-            @Valid CreateCommentRequest request
-    ) {
-        UUID uuid = commentService.createComment(
-                postUuid,
-                commentUuid,
-                authenticatedUser.getUuid(),
-                request.getContent()
-        );
-        return Response.ok(uuid).build();
-    }
-
-    @PermitAll
     @Path("{commentUuid}/vote")
     @POST
     public void voteOnComment(
             @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("postUuid") UUID postUuid,
             @PathParam("commentUuid") UUID commentUuid,
             @Valid VoteRequest voteRequest
     ) {
         commentService.vote(
                 authenticatedUser.getUuid(),
-                postUuid,
                 commentUuid,
                 voteRequest.getDirection()
         );

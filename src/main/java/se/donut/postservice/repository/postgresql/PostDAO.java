@@ -25,6 +25,15 @@ public interface PostDAO {
             "WHERE uuid = :uuid AND is_deleted = false")
     Optional<Post> get(@Bind("uuid") UUID uuid);
 
+    @SqlQuery("SELECT * FROM post WHERE is_deleted = false")
+    List<Post> getAll();
+
+    @SqlQuery("SELECT p.* FROM post p " +
+            "INNER JOIN forum f ON f.uuid = p.forum_uuid " +
+            "INNER JOIN subscription s ON s.forum_uuid = f.uuid " +
+            "WHERE s.user_uuid = :userUuid")
+    List<Post> getBySubscriptions(@Bind("userUuid") UUID userUuid);
+
     @SqlUpdate("UPDATE post SET is_deleted = true WHERE uuid = :uuid")
     void delete(Post post);
 
@@ -65,9 +74,9 @@ public interface PostDAO {
     List<Post> getLiked(@Bind("userUuid") UUID userUuid);
 
     @SqlUpdate("INSERT INTO post_vote " +
-            "(target_uuid, target_parent_uuid, user_uuid, direction) " +
+            "(target_uuid, user_uuid, direction) " +
             "VALUES " +
-            "(:targetUuid, :targetParentUuid, :userUuid, :direction) " +
+            "(:targetUuid, :userUuid, :direction) " +
             "ON CONFLICT DO NOTHING")
     int createVote(@BindBean Vote vote);
 

@@ -11,6 +11,8 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDTO extends AbstractDTO {
 
+    private final UUID forumUuid;
+    private final String forumName;
     private final UUID authorUuid;
     private final String authorName;
     private final String title;
@@ -21,13 +23,18 @@ public class PostDTO extends AbstractDTO {
     public PostDTO(
             UUID uuid,
             Date createdAt,
+            UUID forumUuid,
+            String forumName,
             UUID authorUuid,
             String authorName,
             String title,
             String content,
             int score,
-            Direction myVote) {
+            Direction myVote
+    ) {
         super(uuid, createdAt);
+        this.forumUuid = forumUuid;
+        this.forumName = forumName;
         this.authorUuid = authorUuid;
         this.authorName = authorName;
         this.title = title;

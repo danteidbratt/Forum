@@ -30,9 +30,9 @@ public interface CommentDAO {
     void createComment(@BindBean Comment comment);
 
     @SqlUpdate("INSERT INTO comment_vote " +
-            "(target_uuid, target_parent_uuid, user_uuid, direction) " +
+            "(target_uuid, user_uuid, direction) " +
             "VALUES " +
-            "(:targetUuid, :targetParentUuid, :userUuid, :direction) " +
+            "(:targetUuid, :userUuid, :direction) " +
             "ON CONFLICT DO NOTHING")
     int vote(@BindBean Vote vote);
 
@@ -49,9 +49,12 @@ public interface CommentDAO {
     @SqlUpdate("UPDATE comment SET score = score + :diff WHERE uuid = :commentUuid")
     void updateScoreOnComment(@Bind("commentUuid") UUID commentUuid, @Bind("diff") int diff);
 
-    @SqlQuery("SELECT * FROM comment_vote " +
-            "WHERE user_uuid = :userUuid " +
-            "AND target_parent_uuid = :postUuid")
+    @SqlQuery("SELECT v.* FROM comment_vote v " +
+            "INNER JOIN comment c ON c.uuid = v.target_uuid " +
+            "WHERE c.post_uuid = :postUuid")
+//    @SqlQuery("SELECT * FROM comment_vote " +
+//            "WHERE user_uuid = :userUuid " +
+//            "AND target_parent_uuid = :postUuid")
     List<Vote> getVotes(
             @Bind("userUuid") UUID userUuid,
             @Bind("postUuid") UUID postUuid
@@ -60,7 +63,6 @@ public interface CommentDAO {
     @Transaction
     default void voteAndUpdateScore(Vote vote) {
         int rowsAffected = vote(vote);
-        System.out.println(rowsAffected);
         if (rowsAffected == 1) {
             updateScoreOnComment(vote.getTargetUuid(), vote.getDirection().getValue());
         }
@@ -69,7 +71,6 @@ public interface CommentDAO {
     @Transaction
     default void deleteVoteAndUpdateScore(Vote vote) {
         int rowsAffected = deleteVote(vote);
-        System.out.println(rowsAffected);
         if(rowsAffected == 1) {
             updateScoreOnComment(vote.getTargetUuid(), -vote.getDirection().getValue());
         }

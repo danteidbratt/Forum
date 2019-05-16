@@ -2,10 +2,12 @@ package se.donut.postservice.resource;
 
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
+import se.donut.postservice.model.api.CommentDTO;
 import se.donut.postservice.model.api.PostDTO;
-import se.donut.postservice.resource.request.CreatePostRequest;
+import se.donut.postservice.resource.request.CreateCommentRequest;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.resource.request.VoteRequest;
+import se.donut.postservice.service.CommentService;
 import se.donut.postservice.service.PostService;
 
 import javax.annotation.security.PermitAll;
@@ -16,50 +18,35 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.UUID;
 
-@Path("forums/{forumUuid}/posts")
+@Path("posts")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class PostResource {
 
     private final PostService postService;
+    private final CommentService commentService;
 
-    public PostResource(PostService postService) {
+    public PostResource(PostService postService, CommentService commentService) {
         this.postService = postService;
+        this.commentService = commentService;
     }
 
     @PermitAll
-    @POST
-    public Response createPost(
-            @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("forumUuid") UUID forumUuid,
-            @Valid CreatePostRequest request
-    ) {
-        UUID uuid = postService.createPost(
-                forumUuid,
-                authenticatedUser.getUuid(),
-                request.getTitle(),
-                request.getContent()
-        );
-        return Response.ok(uuid).build();
-    }
-
     @Path("guest")
     @GET
-    public List<PostDTO> getPostsByForumAsGuest(
-            @PathParam("forumUuid") UUID forumUuid,
+    public List<PostDTO> getAllPostsAsGuest(
             @DefaultValue("HOT") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getByForum(forumUuid, sortType);
+        return postService.getAll(sortType);
     }
 
     @PermitAll
     @GET
-    public List<PostDTO> getPostsByForum(
+    public List<PostDTO> getAllPosts(
             @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("forumUuid") UUID forumUuid,
             @DefaultValue("HOT") @QueryParam("sort") SortType sortType
     ) {
-        return postService.getByForum(forumUuid, sortType, authenticatedUser.getUuid());
+        return postService.getAll(sortType, authenticatedUser.getUuid());
     }
 
     @Path("{postUuid}/guest")
@@ -83,11 +70,10 @@ public class PostResource {
     @POST
     public Response voteOnPost(
             @Auth AuthenticatedUser authenticatedUser,
-            @PathParam("forumUuid") UUID forumUuid,
             @PathParam("postUuid") UUID postUuid,
             @Valid VoteRequest voteRequest
     ) {
-        postService.vote(forumUuid, postUuid, authenticatedUser.getUuid(), voteRequest.getDirection());
+        postService.vote(postUuid, authenticatedUser.getUuid(), voteRequest.getDirection());
         return Response.ok().build();
     }
 
@@ -100,6 +86,53 @@ public class PostResource {
     ) {
         postService.deleteVote(authenticatedUser.getUuid(), postUuid);
         return Response.ok().build();
+    }
+
+    @PermitAll
+    @Path("{postUuid}/comments")
+    @POST
+    public Response commentOnPost(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("postUuid") UUID postUuid,
+            CreateCommentRequest request
+    ) {
+        UUID uuid = commentService.createComment(
+                postUuid,
+                request.getParentUuid(),
+                authenticatedUser.getUuid(),
+                request.getContent()
+        );
+        return Response.ok(uuid).build();
+    }
+
+    @Path("{postUuid}/comments/guest")
+    @GET
+    public List<CommentDTO> getCommentsByPostAsGuest(
+            @PathParam("postUuid") UUID postUuid,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getCommentsByPost(postUuid, sortType);
+    }
+
+    @PermitAll
+    @Path("{postUuid}/comments")
+    @GET
+    public List<CommentDTO> getCommentsByPost(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("postUuid") UUID postUuid,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getCommentsByPost(postUuid, sortType, authenticatedUser.getUuid());
+    }
+
+    @PermitAll
+    @Path("subscriptions")
+    @GET
+    public List<PostDTO> getPostsBySubscriptions(
+            @Auth AuthenticatedUser authenticatedUser,
+            @DefaultValue("HOT") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getBySubscriptions(authenticatedUser.getUuid(), sortType);
     }
 
 }

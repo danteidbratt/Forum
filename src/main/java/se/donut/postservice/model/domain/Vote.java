@@ -11,7 +11,6 @@ import java.util.UUID;
 public class Vote {
 
     private final UUID targetUuid;
-    private final UUID targetParentUuid;
     private final UUID userUuid;
     private final Direction direction;
 

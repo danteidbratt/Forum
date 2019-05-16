@@ -3,9 +3,12 @@ package se.donut.postservice.resource;
 import io.dropwizard.auth.Auth;
 import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.model.api.ForumDTO;
+import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.resource.request.CreateForumRequest;
+import se.donut.postservice.resource.request.CreatePostRequest;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.service.ForumService;
+import se.donut.postservice.service.PostService;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
@@ -21,16 +24,16 @@ import java.util.UUID;
 public class ForumResource {
 
     private final ForumService forumService;
+    private final PostService postService;
 
-    public ForumResource(ForumService forumService) {
+    public ForumResource(ForumService forumService, PostService postService) {
         this.forumService = forumService;
+        this.postService = postService;
     }
 
     @Path("guest")
     @GET
-    public List<ForumDTO> getForumsAsGuest(
-            @DefaultValue("25") @QueryParam("pageSize") int pageSize,
-            @DefaultValue("0") @QueryParam("page") int page,
+    public List<ForumDTO> getAllForumsAsGuest(
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
         return forumService.getAllForums(sortType);
@@ -38,10 +41,8 @@ public class ForumResource {
 
     @PermitAll
     @GET
-    public List<ForumDTO> getForums(
+    public List<ForumDTO> getAllForums(
             @Auth AuthenticatedUser authenticatedUser,
-            @DefaultValue("25") @QueryParam("pageSize") int pageSize,
-            @DefaultValue("0") @QueryParam("page") int page,
             @DefaultValue("TOP") @QueryParam("sort") SortType sortType
     ) {
         return forumService.getAllForums(sortType, authenticatedUser.getUuid());
@@ -60,14 +61,41 @@ public class ForumResource {
         );
     }
 
-    @PermitAll
-    @Path("{forumUuid}/subscriptions")
+    @Path("{forumUuid}/posts/guest")
     @GET
-    public List<ForumDTO> getSubscriptions(
-            @Auth AuthenticatedUser authenticatedUser,
-            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    public List<PostDTO> getPostsByForumAsGuest(
+            @PathParam("forumUuid") UUID forumUuid,
+            @DefaultValue("HOT") @QueryParam("sort") SortType sortType
     ) {
-        return forumService.getSubscriptions(authenticatedUser.getUuid(), sortType);
+        return postService.getByForum(forumUuid, sortType);
+    }
+
+    @PermitAll
+    @Path("{forumUuid}/posts")
+    @GET
+    public List<PostDTO> getPostsByForum(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("forumUuid") UUID forumUuid,
+            @DefaultValue("HOT") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getByForum(forumUuid, sortType, authenticatedUser.getUuid());
+    }
+
+    @PermitAll
+    @Path("{forumUuid}/posts")
+    @POST
+    public Response createPost(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("forumUuid") UUID forumUuid,
+            @Valid CreatePostRequest request
+    ) {
+        UUID uuid = postService.createPost(
+                forumUuid,
+                authenticatedUser.getUuid(),
+                request.getTitle(),
+                request.getContent()
+        );
+        return Response.ok(uuid).build();
     }
 
     @PermitAll
@@ -90,6 +118,16 @@ public class ForumResource {
     ) {
         forumService.unsubscribe(authenticatedUser.getUuid(), forumUuid);
         return Response.ok().build();
+    }
+
+    @PermitAll
+    @Path("subscriptions")
+    @GET
+    public List<ForumDTO> getSubscribedForums(
+            @Auth AuthenticatedUser authenticatedUser,
+            @DefaultValue("TOP") @QueryParam("sort") SortType sortType
+    ) {
+        return forumService.getSubscriptions(authenticatedUser.getUuid(), sortType);
     }
 
 }

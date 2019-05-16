@@ -15,7 +15,6 @@ public class VoteMapper implements RowMapper<Vote> {
     public Vote map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new Vote(
                 UUID.fromString(rs.getString("target_uuid")),
-                UUID.fromString(rs.getString("target_parent_uuid")),
                 UUID.fromString(rs.getString("user_uuid")),
                 Direction.valueOf(rs.getString("direction"))
         );

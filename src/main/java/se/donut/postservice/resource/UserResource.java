@@ -24,7 +24,6 @@ public class UserResource {
 
     private final UserService userService;
     private final PostService postService;
-    private final UriBuilder uriBuilder = UriBuilder.fromResource(UserResource.class);
 
     public UserResource(UserService userService, PostService postService) {
         this.userService = userService;

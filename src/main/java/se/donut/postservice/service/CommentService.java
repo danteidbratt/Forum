@@ -79,30 +79,23 @@ public class CommentService {
 
     public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType, UUID userUuid) {
         List<Comment> comments = commentDAO.getCommentsByPostUuid(postUuid);
-
-        List<UUID> authorUuids = comments.stream()
+        Map<UUID, User> authors = userDAO.get(comments.stream()
                 .map(Comment::getAuthorUuid)
-                .collect(Collectors.toList());
-
-        Map<UUID, User> authors = userDAO.get(authorUuids);
-
+                .collect(Collectors.toList()));
         Map<UUID, Vote> myVotes = userUuid != null ?
                 commentDAO.getVotes(userUuid, postUuid).stream()
                         .collect(Collectors.toMap(Vote::getTargetUuid, x -> x))
                 : new HashMap<>();
-
         Map<UUID, List<Comment>> commentMap = comments.stream()
                 .map(c -> new SortableComment(c, sortType))
                 .sorted(sortType.getComparator())
                 .collect(Collectors.groupingBy(Comment::getParentUuid));
-
         return buildCommentTree(commentMap, myVotes, authors, postUuid);
     }
 
-    public void vote(UUID userUuid, UUID postUuid, UUID commentUuid, Direction direction) {
+    public void vote(UUID userUuid, UUID commentUuid, Direction direction) {
         Vote vote = new Vote(
                 commentUuid,
-                postUuid,
                 userUuid,
                 direction
         );
@@ -135,14 +128,10 @@ public class CommentService {
     }
 
     private List<CommentDTO> stackCommentsRecursively(Map<UUID, List<CommentDTO>> comments, UUID parentUuid) {
-        if (!comments.containsKey(parentUuid)) {
+        if (!comments.containsKey(parentUuid))
             return new ArrayList<>();
-        }
-
-        for (CommentDTO comment : comments.get(parentUuid)) {
+        for (CommentDTO comment : comments.get(parentUuid))
             comment.setChildren(stackCommentsRecursively(comments, comment.getUuid()));
-        }
-
         return comments.get(parentUuid);
     }
 
