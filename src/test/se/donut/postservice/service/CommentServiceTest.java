@@ -118,25 +118,6 @@ public class CommentServiceTest {
     }
 
     @Test
-    public void shouldNotBeAbleToCreateCommentWithEmptyContent() {
-        // Arrange
-        UUID postUuid = UUID.randomUUID();
-        UUID userUuid = UUID.randomUUID();
-        String content = "";
-
-        // Act
-        try {
-            commentService.createComment(postUuid, postUuid, userUuid, content);
-            fail();
-        } catch (PostServiceException e) {
-            assertEquals(INVALID_CONTENT, e.getExceptionType());
-        }
-
-        // Assert
-        verify(commentDAO, never()).createComment(any());
-    }
-
-    @Test
     public void shouldNotBeAbleToCreateCommentOnNonExistingComment() {
         // Arrange
         UUID parentUuid = UUID.randomUUID();

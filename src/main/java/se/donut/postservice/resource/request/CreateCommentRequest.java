@@ -15,7 +15,7 @@ public class CreateCommentRequest {
     private UUID parentUuid;
 
     @NotNull
-    @Size(max = 512)
+    @Size(min = 1, max = 511)
     private String content;
 
 }

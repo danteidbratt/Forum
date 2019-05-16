@@ -11,11 +11,11 @@ import javax.validation.constraints.Size;
 public class CreateForumRequest {
 
     @NotNull
-    @Size(max = 32)
+    @Size(min = 3, max = 31)
     private String name;
 
     @NotNull
-    @Size(max = 256)
+    @Size(min = 1, max = 1023)
     private String description;
 
 }

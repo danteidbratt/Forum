@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
-import static se.donut.postservice.exception.ExceptionType.INVALID_TITLE;
 
 public class PostServiceTest {
 
@@ -32,22 +31,6 @@ public class PostServiceTest {
         postDAO = mock(PostDAO.class);
         forumDao = mock(ForumDAO.class);
         postService = new PostService(userDAO, postDAO, forumDao);
-    }
-
-    @Test
-    public void shouldNotBeAbleToCreatePostWithEmptyTitle() {
-        String title = "";
-        String content = "some content";
-        UUID forumUuid = UUID.randomUUID();
-        UUID userUuid = UUID.randomUUID();
-
-        try {
-            postService.createPost(forumUuid, userUuid, title, content);
-            fail();
-        } catch (PostServiceException e) {
-            assertEquals(INVALID_TITLE, e.getExceptionType());
-        }
-        verify(postDAO, never()).create(any());
     }
 
     @Test
@@ -92,6 +75,28 @@ public class PostServiceTest {
 
         assertEquals(title, post.getTitle());
         assertEquals(content, post.getContent());
+        assertEquals(forumUuid, post.getForumUuid());
+        assertEquals(userUuid, post.getAuthorUuid());
+    }
+
+    @Test
+    public void postNameAndContentShouldBeStrippedOfExcessWhitespace() {
+        String title = " some    title ";
+        String content = " some    content ";
+        UUID forumUuid = UUID.randomUUID();
+        UUID userUuid = UUID.randomUUID();
+        when(forumDao.getForum(eq(forumUuid))).thenReturn(Optional.of(mock(Forum.class)));
+
+        // Act
+        postService.createPost(forumUuid, userUuid, title, content);
+
+        // Assert
+        ArgumentCaptor<Post> argumentCaptor = ArgumentCaptor.forClass(Post.class);
+        verify(postDAO, times(1)).create(argumentCaptor.capture());
+        Post post = argumentCaptor.getValue();
+
+        assertEquals("some title", post.getTitle());
+        assertEquals("some content", post.getContent());
         assertEquals(forumUuid, post.getForumUuid());
         assertEquals(userUuid, post.getAuthorUuid());
     }

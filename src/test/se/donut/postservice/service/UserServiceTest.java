@@ -30,22 +30,12 @@ public class UserServiceTest {
 
     @Test
     public void shouldNotBeAbleToCreateUserWithWhitespaceInUsername() {
-        testUsernameAndPassword("some username", "password", INVALID_USERNAME);
-    }
-
-    @Test
-    public void shouldNotBeAbleToCreateUserWithShortUsername() {
-        testUsernameAndPassword("Yu", "password", INVALID_USERNAME);
+        assertExceptionTypeForUserCreation("some username", "password", INVALID_USERNAME);
     }
 
     @Test
     public void shouldNotBeAbleToCreateUserWithWhitespaceInPassword() {
-        testUsernameAndPassword("username", "some password", INVALID_PASSWORD);
-    }
-
-    @Test
-    public void shouldNotBeAbleToCreateUserWithShortPassword() {
-        testUsernameAndPassword("username", "pass", INVALID_PASSWORD);
+        assertExceptionTypeForUserCreation("username", "some password", INVALID_PASSWORD);
     }
 
     @Test
@@ -84,7 +74,7 @@ public class UserServiceTest {
         assertEquals(USER, user.getRole());
     }
 
-    private void testUsernameAndPassword(String username, String password, ExceptionType expectedExceptionType) {
+    private void assertExceptionTypeForUserCreation(String username, String password, ExceptionType expectedExceptionType) {
         try {
             userService.createUser(username, password);
             fail();

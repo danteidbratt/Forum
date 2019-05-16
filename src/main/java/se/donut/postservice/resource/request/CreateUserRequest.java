@@ -12,11 +12,11 @@ import javax.validation.constraints.Size;
 public class CreateUserRequest {
 
     @NotNull
-    @Size(min = 3, max = 32)
+    @Size(min = 3, max = 31)
     private String username;
 
     @NotNull
-    @Size(min = 3, max = 256)
+    @Size(min = 3, max = 255)
     private String password;
 
 }
