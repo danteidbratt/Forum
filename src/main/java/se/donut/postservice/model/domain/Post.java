@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter
 public class Post extends Submission {
 
+    private final int commentCount;
     private final UUID forumUuid;
     private final String title;
 
@@ -20,11 +21,13 @@ public class Post extends Submission {
             int score,
             UUID forumUuid,
             String title,
-            Date createdAt
+            Date createdAt,
+            int commentCount
     ) {
         super(uuid, authorUuid, content, score, createdAt);
         this.forumUuid = forumUuid;
         this.title = title;
+        this.commentCount = commentCount;
     }
 
     public PostDTO toApiModel(String forumName, String authorName, Direction direction) {
@@ -35,6 +38,7 @@ public class Post extends Submission {
                 forumName,
                 this.getAuthorUuid(),
                 authorName,
+                this.getCommentCount(),
                 this.getTitle(),
                 this.getContent(),
                 this.getScore(),

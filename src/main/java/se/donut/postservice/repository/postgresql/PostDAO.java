@@ -38,9 +38,9 @@ public interface PostDAO {
     void delete(Post post);
 
     @SqlUpdate("INSERT INTO post " +
-            "(uuid, author_uuid, content, score, forum_uuid, title, created_at, is_deleted) " +
+            "(uuid, author_uuid, content, score, forum_uuid, title, created_at, comment_count, is_deleted) " +
             "VALUES " +
-            "(:uuid, :authorUuid, :content, :score, :forumUuid, :title, :createdAt, false)")
+            "(:uuid, :authorUuid, :content, :score, :forumUuid, :title, :createdAt, :commentCount, false)")
     void create(@BindBean Post post);
 
     @SqlQuery("SELECT p.*, u.name AS author_name FROM post p " +
@@ -56,12 +56,6 @@ public interface PostDAO {
             @Bind("userUuid") UUID userUuid,
             @BindList("forumUuids") List<UUID> forumUuids
     );
-//    @SqlQuery("SELECT * FROM post_vote " +
-//            "WHERE user_uuid = :userUuid AND target_uuid IN (<postUuids>)")
-//    List<Vote> getVotes(
-//            @Bind("userUuid") UUID userUuid,
-//            @BindList("postUuids") List<UUID> postUuids
-//    );
 
     @SqlQuery("SELECT * FROM post_vote " +
             "WHERE user_uuid = :userUuid AND target_uuid = :postUuid")
@@ -80,6 +74,12 @@ public interface PostDAO {
             "AND v.direction = 'UP' " +
             "WHERE v.user_uuid = :userUuid")
     List<Post> getByLikes(@Bind("userUuid") UUID userUuid);
+
+    @SqlUpdate("UPDATE post SET comment_count = comment_count + :diff WHERE uuid = :postUuid")
+    void updateCommentCount(
+            @Bind("postUuid") UUID postUuid,
+            @Bind("diff") int diff
+    );
 
     @SqlUpdate("INSERT INTO post_vote " +
             "(target_uuid, user_uuid, direction) " +

@@ -68,7 +68,7 @@ public class CommentService {
                 postUuid,
                 new Date()
         );
-        commentDAO.createComment(comment);
+        commentDAO.createCommentAndUpdateCounter(comment);
         return commentUuid;
     }
 
@@ -114,6 +114,10 @@ public class CommentService {
     }
 
     public void vote(UUID userUuid, UUID commentUuid, Direction direction) {
+        commentDAO.getComment(commentUuid).orElseThrow(() -> new PostServiceException(
+                COMMENT_NOT_FOUND,
+                String.format("Could not find comment with uuid %s", commentUuid)
+        ));
         Vote vote = new Vote(commentUuid, userUuid, direction);
         commentDAO.voteAndUpdateScore(vote);
     }

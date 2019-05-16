@@ -22,7 +22,8 @@ public class SortablePost extends Post implements Sortable {
                 post.getScore(),
                 post.getForumUuid(),
                 post.getTitle(),
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                post.getCommentCount()
         );
         this.heat = sortType.equals(HOT) ? Ranking.calculateHeat(post) : 0;
     }

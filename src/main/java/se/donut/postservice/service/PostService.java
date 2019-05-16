@@ -104,8 +104,8 @@ public class PostService {
                 0,
                 forumUuid,
                 title,
-                new Date()
-        );
+                new Date(),
+                0);
         postDAO.create(post);
         return postUuid;
     }

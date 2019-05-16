@@ -1,11 +1,13 @@
 package se.donut.postservice.repository.postgresql;
 
+import org.jdbi.v3.sqlobject.CreateSqlObject;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
+import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.model.domain.Comment;
 import se.donut.postservice.model.domain.Vote;
 
@@ -14,6 +16,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CommentDAO {
+
+    @CreateSqlObject
+    PostDAO getPostDAO();
 
     @SqlQuery("SELECT * FROM comment " +
             "WHERE uuid = :uuid " +
@@ -67,6 +72,12 @@ public interface CommentDAO {
             @Bind("userUuid") UUID userUuid,
             @BindList("commentUuids") List<UUID> commentUuids
     );
+
+    @Transaction
+    default void createCommentAndUpdateCounter(Comment comment) {
+        createComment(comment);
+        getPostDAO().updateCommentCount(comment.getPostUuid(), 1);
+    }
 
     @Transaction
     default void voteAndUpdateScore(Vote vote) {

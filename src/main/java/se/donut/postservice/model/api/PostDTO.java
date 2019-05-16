@@ -15,6 +15,7 @@ public class PostDTO extends AbstractDTO {
     private final String forumName;
     private final UUID authorUuid;
     private final String authorName;
+    private final int commentCount;
     private final String title;
     private final String content;
     private final int score;
@@ -27,6 +28,7 @@ public class PostDTO extends AbstractDTO {
             String forumName,
             UUID authorUuid,
             String authorName,
+            int commentCount,
             String title,
             String content,
             int score,
@@ -37,6 +39,7 @@ public class PostDTO extends AbstractDTO {
         this.forumName = forumName;
         this.authorUuid = authorUuid;
         this.authorName = authorName;
+        this.commentCount = commentCount;
         this.title = title;
         this.content = content;
         this.score = score;
