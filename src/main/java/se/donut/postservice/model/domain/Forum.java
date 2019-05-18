@@ -23,14 +23,15 @@ public class Forum extends Submission {
         this.name = name;
     }
 
-    public ForumDTO toApiModel(String authorName) {
-        return toApiModel(authorName, null);
+    public ForumDTO toApiModel(String authorName, Date now) {
+        return toApiModel(authorName, now, null);
     }
 
-    public ForumDTO toApiModel(String authorName, Boolean subscribed) {
+    public ForumDTO toApiModel(String authorName, Date now, Boolean subscribed) {
         return new ForumDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
+                now,
                 this.getAuthorUuid(),
                 authorName,
                 this.getName(),

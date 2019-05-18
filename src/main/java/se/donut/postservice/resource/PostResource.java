@@ -31,7 +31,6 @@ public class PostResource {
         this.commentService = commentService;
     }
 
-    @PermitAll
     @Path("guest")
     @GET
     public List<PostDTO> getAllPostsAsGuest(
@@ -91,18 +90,18 @@ public class PostResource {
     @PermitAll
     @Path("{postUuid}/comments")
     @POST
-    public Response commentOnPost(
+    public CommentDTO createComment(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("postUuid") UUID postUuid,
             CreateCommentRequest request
     ) {
-        UUID uuid = commentService.createComment(
+        return commentService.createComment(
                 postUuid,
                 request.getParentUuid(),
                 authenticatedUser.getUuid(),
+                authenticatedUser.getName(),
                 request.getContent()
         );
-        return Response.ok(uuid).build();
     }
 
     @Path("{postUuid}/comments/guest")

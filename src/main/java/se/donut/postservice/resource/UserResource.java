@@ -42,6 +42,23 @@ public class UserResource {
         return userService.getUser(userUuid);
     }
 
+    @PermitAll
+    @Path("me")
+    @GET
+    public UserDTO getMe(@Auth AuthenticatedUser authenticatedUser) {
+        return userService.getUser(authenticatedUser.getUuid());
+    }
+
+
+    @PermitAll
+    @Path("login")
+    @GET
+    public UserDTO login(
+            @Auth AuthenticatedUser authenticatedUser
+    ) {
+        return userService.getUser(authenticatedUser.getUuid());
+    }
+
     @POST
     public Response createUser(@Valid CreateUserRequest request) {
         UUID uuid = userService.createUser(request.getUsername(), request.getPassword());

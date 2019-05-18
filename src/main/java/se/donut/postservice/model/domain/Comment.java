@@ -27,10 +27,11 @@ public class Comment extends Submission {
         this.postUuid = postUuid;
     }
 
-    public CommentDTO toApiModel(String authorName, Direction myVote) {
+    public CommentDTO toApiModel(String authorName, Direction myVote, Date now) {
         return new CommentDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
+                now,
                 this.getAuthorUuid(),
                 authorName,
                 this.getContent(),

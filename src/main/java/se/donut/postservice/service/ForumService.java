@@ -10,6 +10,7 @@ import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.DataValidator;
+import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,12 +51,17 @@ public class ForumService {
 
         Map<UUID, User> users = userDAO.get(userUuids);
 
+        Date now = new Date();
+
         return forums.stream()
                 .map(f -> new SortableForum(f, sortType))
                 .sorted(sortType.getComparator())
-                .map(f -> f.toApiModel(
-                        users.get(f.getAuthorUuid()).getName(),
-                        userUuid != null ? subscriptions.containsKey(f.getUuid()) : null))
+                .map(f -> {
+                    Optional<User> author = Optional.ofNullable(users.get(f.getAuthorUuid()));
+                    String authorName = author.map(User::getName).orElse("[deleted]");
+                    Boolean subscribed = userUuid != null ? subscriptions.containsKey(f.getUuid()) : null;
+                    return f.toApiModel(authorName, now, subscribed);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -68,10 +74,16 @@ public class ForumService {
 
         Map<UUID, User> users = userDAO.get(userUuids);
 
+        Date now = new Date();
+
         return forums.stream()
                 .map(f -> new SortableForum(f, sortType))
                 .sorted(sortType.getComparator())
-                .map(f -> f.toApiModel(users.get(f.getAuthorUuid()).getName(), true))
+                .map(f -> {
+                    User author = users.get(f.getAuthorUuid());
+                    String authorName = author != null ? author.getName() : "[deleted]";
+                    return f.toApiModel(authorName, now, true);
+                })
                 .collect(Collectors.toList());
     }
 

@@ -24,8 +24,17 @@ public class CommentDTO extends AbstractDTO{
     private List<CommentDTO> children;
 
 
-    public CommentDTO(UUID uuid, Date createdAt, UUID authorUuid, String authorName, String content, int score, Direction myVote) {
-        super(uuid, createdAt);
+    public CommentDTO(
+            UUID uuid,
+            Date createdAt,
+            Date now,
+            UUID authorUuid,
+            String authorName,
+            String content,
+            int score,
+            Direction myVote
+    ) {
+        super(uuid, createdAt, now);
         this.authorUuid = authorUuid;
         this.authorName = authorName;
         this.content = content;

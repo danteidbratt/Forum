@@ -10,6 +10,7 @@ import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.DataValidator;
+import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,11 +30,11 @@ public class CommentService {
         this.userDAO = userDAO;
     }
 
-    @Transaction
-    public UUID createComment(
+    public CommentDTO createComment(
             UUID postUuid,
             UUID parentUuid,
             UUID authorUuid,
+            String authorName,
             String content
     ) {
         content = DataValidator.validateCommentContent(content);
@@ -69,7 +70,9 @@ public class CommentService {
                 new Date()
         );
         commentDAO.createCommentAndUpdateCounter(comment);
-        return commentUuid;
+        CommentDTO commentDTO = comment.toApiModel(authorName, null, new Date());
+        commentDTO.setChildren(new ArrayList<>());
+        return commentDTO;
     }
 
     public List<CommentDTO> getCommentsByPost(UUID postUuid, SortType sortType) {
@@ -135,10 +138,11 @@ public class CommentService {
             return new ArrayList<>();
         }
         Decoration decoration = getDecoration(comments, userUuid);
+        Date now = new Date();
         return comments.stream()
                 .map(c -> new SortableComment(c, sortType))
                 .sorted(sortType.getComparator())
-                .map(c -> buildApiModel(c, decoration))
+                .map(c -> buildApiModel(c, decoration, now))
                 .collect(Collectors.toList());
     }
 
@@ -159,6 +163,7 @@ public class CommentService {
             return new HashMap<>();
         }
         Decoration decoration = getDecoration(comments, userUuid);
+        Date now = new Date();
         Map<UUID, List<CommentDTO>> commentDTOs = comments.stream()
                 .map(c -> new SortableComment(c, sortType))
                 .sorted(sortType.getComparator())
@@ -167,7 +172,7 @@ public class CommentService {
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
                         x -> x.getValue().stream()
-                                .map(c -> buildApiModel(c, decoration))
+                                .map(c -> buildApiModel(c, decoration, now))
                                 .collect(Collectors.toList())
                 ));
         return commentDTOs;
@@ -192,12 +197,15 @@ public class CommentService {
         return new Decoration(authors, myVotes);
     }
 
-    private CommentDTO buildApiModel(Comment comment, Decoration decoration) {
-        Vote myVote = decoration.myVotes.get(comment.getUuid());
+    private CommentDTO buildApiModel(Comment comment, Decoration decoration, Date now) {
         User author = decoration.authors.get(comment.getAuthorUuid());
+        String authorName = author != null ? author.getName() : null;
+        Vote myVote = decoration.myVotes.get(comment.getUuid());
+        Direction voteDirection = myVote != null ? myVote.getDirection() : null;
         return comment.toApiModel(
-                author != null ? author.getName() : null,
-                myVote != null ? myVote.getDirection() : null
+                authorName,
+                voteDirection,
+                now
         );
     }
 

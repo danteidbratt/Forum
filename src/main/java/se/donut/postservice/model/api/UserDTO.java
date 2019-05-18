@@ -13,8 +13,8 @@ public class UserDTO extends AbstractDTO {
     private final Integer carma;
     private final Role role;
 
-    public UserDTO(UUID uuid, Date createdAt, String name, Integer carma, Role role) {
-        super(uuid, createdAt);
+    public UserDTO(UUID uuid, Date createdAt, Date now, String name, Integer carma, Role role) {
+        super(uuid, createdAt, now);
         this.name = name;
         this.carma = carma;
         this.role = role;

@@ -18,10 +18,11 @@ public class User extends AbstractEntity {
         this.role = role;
     }
 
-    public UserDTO toApiModel(int carma) {
+    public UserDTO toApiModel(int carma, Date now) {
         return new UserDTO(
                 this.getUuid(),
                 this.getCreatedAt(),
+                now,
                 this.getName(),
                 carma,
                 this.getRole()

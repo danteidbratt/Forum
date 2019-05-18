@@ -56,26 +56,6 @@ public class CommentServiceTest {
     }
 
     @Test
-    public void shouldBeAbleToSortCommentByNew() {
-        // Arrange
-        UUID postUuid = UUID.randomUUID();
-        int numberOfComments = 10;
-        List<Comment> comments = generateListOfRandomRootComments(numberOfComments, postUuid);
-        when(commentDAO.getCommentsByPost(postUuid)).thenReturn(comments);
-
-        // Act
-        List<CommentDTO> commentTree = commentService.getCommentsByPost(postUuid, NEW);
-
-        // Assert
-        assertEquals(numberOfComments, commentTree.size());
-        Date previousInstant = new Date(Long.MAX_VALUE);
-        for (CommentDTO commentDTO : commentTree) {
-            assertTrue(previousInstant.after(commentDTO.getCreatedAt()));
-            previousInstant = commentDTO.getCreatedAt();
-        }
-    }
-
-    @Test
     public void shouldBeAbleToSortCommentsByHot() {
         UUID userUuid = UUID.randomUUID();
         UUID postUuid = UUID.randomUUID();
@@ -134,6 +114,7 @@ public class CommentServiceTest {
                     postUuid,
                     parentUuid,
                     authorUuid,
+                    "some name",
                     "some content"
             );
             fail();
@@ -158,6 +139,7 @@ public class CommentServiceTest {
                     postUuid,
                     parentUuid,
                     authorUuid,
+                    "some name",
                     "some content"
             );
             fail();

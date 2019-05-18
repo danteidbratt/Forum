@@ -28,7 +28,7 @@ public class UserService {
                         USER_NOT_FOUND,
                         String.format("Could not find user with uuid %s.", userUuid)));
         int carma = userDAO.getCarma(user.getUuid());
-        return user.toApiModel(carma);
+        return user.toApiModel(carma, new Date());
     }
 
     public UUID createUser(String username, String password) {
@@ -59,7 +59,7 @@ public class UserService {
         Optional<User> user = userDAO.authenticate(username, password);
         if (user.isPresent()) {
             int carma = userDAO.getCarma(user.get().getUuid());
-            return user.get().toApiModel(carma);
+            return user.get().toApiModel(carma, new Date());
         }
         return null;
     }

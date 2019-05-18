@@ -10,7 +10,7 @@ import static java.lang.Math.*;
 public final class Ranking {
 
     private static final long EARLIEST_POSSIBLE_TIMESTAMP = 1557187200;
-    private static final double TIME_THRESHOLD = Duration.ofMinutes(5).getSeconds();
+    private static final double TIME_THRESHOLD = Duration.ofHours(12).getSeconds();
 
     /**
      * @param date The date at which the submission was created.

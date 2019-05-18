@@ -15,6 +15,7 @@ import org.jdbi.v3.core.Jdbi;
 import se.donut.postservice.auth.AuthenticatedUser;
 import se.donut.postservice.auth.UserAuthenticator;
 import se.donut.postservice.auth.UserAuthorizer;
+import se.donut.postservice.filter.CorsFilter;
 import se.donut.postservice.model.mapper.*;
 import se.donut.postservice.repository.postgresql.CommentDAO;
 import se.donut.postservice.repository.postgresql.ForumDAO;
@@ -81,6 +82,7 @@ public class App extends Application<Config> {
         environment.jersey().register(postResource);
         environment.jersey().register(forumResource);
         environment.jersey().register(commentResource);
+        environment.jersey().register(new CorsFilter());
         environment.jersey().register(JdbiExceptionsBundle.class);
     }
 

@@ -24,6 +24,7 @@ public class PostDTO extends AbstractDTO {
     public PostDTO(
             UUID uuid,
             Date createdAt,
+            Date now,
             UUID forumUuid,
             String forumName,
             UUID authorUuid,
@@ -34,7 +35,7 @@ public class PostDTO extends AbstractDTO {
             int score,
             Direction myVote
     ) {
-        super(uuid, createdAt);
+        super(uuid, createdAt, now);
         this.forumUuid = forumUuid;
         this.forumName = forumName;
         this.authorUuid = authorUuid;

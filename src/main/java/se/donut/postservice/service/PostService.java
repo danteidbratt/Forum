@@ -9,6 +9,7 @@ import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.DataValidator;
+import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +49,7 @@ public class PostService {
         return post.toApiModel(
                 forum.map(Forum::getName).orElse(null),
                 author.map(User::getName).orElse(null),
+                new Date(),
                 userVote.map(Vote::getDirection).orElse(null)
         );
     }
@@ -62,7 +64,7 @@ public class PostService {
     }
 
     public List<PostDTO> getByAuthor(UUID authorUuid, SortType sortType) {
-        return getByAuthor(authorUuid, sortType,null);
+        return getByAuthor(authorUuid, sortType, null);
     }
 
     public List<PostDTO> getByAuthor(UUID authorUuid, SortType sortType, UUID userUuid) {
@@ -86,7 +88,7 @@ public class PostService {
 
     public List<PostDTO> getAll(SortType sortType, UUID userUuid) {
         List<Post> posts = postDAO.getAll();
-        return buildApiModels(posts,  sortType, userUuid);
+        return buildApiModels(posts, sortType, userUuid);
     }
 
     public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
@@ -131,10 +133,6 @@ public class PostService {
                 .stream()
                 .collect(Collectors.toMap(AbstractEntity::getUuid, f -> f));
 
-//        List<UUID> postUuids = posts.stream()
-//                .map(Post::getUuid)
-//                .collect(Collectors.toList());
-
         Map<UUID, Vote> myVotes = userUuid != null ?
                 postDAO.getVotes(userUuid, forumUuids).stream()
                         .collect(Collectors.toMap(
@@ -149,17 +147,17 @@ public class PostService {
 
         Map<UUID, User> authors = userDAO.get(authorUuids);
 
+        Date now = new Date();
+
         return posts.stream()
                 .map(p -> new SortablePost(p, sortType))
                 .sorted(sortType.getComparator())
                 .map(p -> {
-                    User author = authors.get(p.getAuthorUuid());
-                    Vote vote = myVotes.get(p.getUuid());
-                    return p.toApiModel(
-                            forums.get(p.getForumUuid()).getName(),
-                            author != null ? author.getName() : null,
-                            vote != null ? vote.getDirection() : null
-                    );
+                    String forumName = forums.get(p.getForumUuid()).getName();
+                    String authorName = authors.get(p.getAuthorUuid()).getName();
+                    Optional<Vote> vote = Optional.ofNullable(myVotes.get(p.getUuid()));
+                    Direction voteDirection = vote.map(Vote::getDirection).orElse(null);
+                    return p.toApiModel(forumName, authorName, now, voteDirection);
                 })
                 .collect(Collectors.toList());
     }

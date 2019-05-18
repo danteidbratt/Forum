@@ -20,13 +20,15 @@ public class ForumDTO extends AbstractDTO {
     public ForumDTO(
             UUID uuid,
             Date createdAt,
+            Date now,
             UUID authorUuid,
             String authorName,
             String name,
             String description,
             int subscribers,
-            Boolean subscribed) {
-        super(uuid, createdAt);
+            Boolean subscribed
+    ) {
+        super(uuid, createdAt, now);
         this.authorUuid = authorUuid;
         this.authorName = authorName;
         this.name = name;
