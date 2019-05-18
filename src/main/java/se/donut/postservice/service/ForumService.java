@@ -59,7 +59,7 @@ public class ForumService {
                 .map(f -> {
                     Optional<User> author = Optional.ofNullable(users.get(f.getAuthorUuid()));
                     String authorName = author.map(User::getName).orElse("[deleted]");
-                    Boolean subscribed = userUuid != null ? subscriptions.containsKey(f.getUuid()) : null;
+                    Boolean subscribed = userUuid != null && subscriptions.containsKey(f.getUuid());
                     return f.toApiModel(authorName, now, subscribed);
                 })
                 .collect(Collectors.toList());
