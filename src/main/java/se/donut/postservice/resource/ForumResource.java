@@ -66,12 +66,13 @@ public class ForumResource {
 
     @PermitAll
     @POST
-    public UUID createForum(
-            @Auth AuthenticatedUser user,
+    public ForumDTO createForum(
+            @Auth AuthenticatedUser authenticatedUser,
             @Valid CreateForumRequest request
     ) {
         return forumService.createForum(
-                user.getUuid(),
+                authenticatedUser.getUuid(),
+                authenticatedUser.getName(),
                 request.getName(),
                 request.getDescription()
         );
@@ -100,18 +101,18 @@ public class ForumResource {
     @PermitAll
     @Path("{forumUuid}/posts")
     @POST
-    public Response createPost(
+    public PostDTO createPost(
             @Auth AuthenticatedUser authenticatedUser,
             @PathParam("forumUuid") UUID forumUuid,
             @Valid CreatePostRequest request
     ) {
-        UUID uuid = postService.createPost(
+        return postService.createPost(
                 forumUuid,
                 authenticatedUser.getUuid(),
+                authenticatedUser.getName(),
                 request.getTitle(),
                 request.getContent()
         );
-        return Response.ok(uuid).build();
     }
 
     @PermitAll

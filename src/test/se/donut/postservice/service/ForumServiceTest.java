@@ -38,7 +38,7 @@ public class ForumServiceTest {
 
         // Act
         try {
-            forumService.createForum(UUID.randomUUID(), forumName, "some description");
+            forumService.createForum(UUID.randomUUID(), "some name", forumName, "some description");
             fail();
         } catch (PostServiceException e) {
             assertEquals(FORUM_NAME_ALREADY_TAKEN, e.getExceptionType());
@@ -56,7 +56,7 @@ public class ForumServiceTest {
 
         // Act
         try {
-            forumService.createForum(UUID.randomUUID(), forumName, "some description");
+            forumService.createForum(UUID.randomUUID(), "some name", forumName, "some description");
             fail();
         } catch (PostServiceException e) {
             assertEquals(INVALID_FORUM_NAME, e.getExceptionType());
@@ -72,7 +72,7 @@ public class ForumServiceTest {
         UUID userUuid = UUID.randomUUID();
 
         // Act
-        forumService.createForum(userUuid, "worldNews1", "some description");
+        forumService.createForum(userUuid, "some name", "worldNews1", "some description");
 
         // Assert
         ArgumentCaptor<Forum> forumArgumentCaptor = ArgumentCaptor.forClass(Forum.class);

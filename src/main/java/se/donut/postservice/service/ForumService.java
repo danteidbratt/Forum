@@ -113,7 +113,7 @@ public class ForumService {
                 .collect(Collectors.toList());
     }
 
-    public UUID createForum(UUID userUuid, String name, String description) {
+    public ForumDTO createForum(UUID userUuid, String userName, String name, String description) {
         DataValidator.validateForumName(name);
         description = DataValidator.validateForumDescription(description);
         Optional<Forum> forumWithSameName = forumDAO.getForumByName(name);
@@ -140,7 +140,7 @@ public class ForumService {
         forumDAO.createForum(forum);
         forumDAO.subscribe(subscription);
 
-        return forumUuid;
+        return forum.toApiModel(userName, new Date(), true);
     }
 
     public void subscribe(UUID userUuid, UUID forumUuid) {

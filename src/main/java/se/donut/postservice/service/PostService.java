@@ -91,10 +91,10 @@ public class PostService {
         return buildApiModels(posts, sortType, userUuid);
     }
 
-    public UUID createPost(UUID forumUuid, UUID authorUuid, String title, String content) {
+    public PostDTO createPost(UUID forumUuid, UUID authorUuid, String authorName, String title, String content) {
         title = DataValidator.validatePostTitle(title);
         content = DataValidator.validatePostContent(content);
-        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(
+        Forum forum = forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(
                 FORUM_NOT_FOUND,
                 String.format("Could not find forum with uuid %s.", forumUuid)));
 
@@ -109,7 +109,7 @@ public class PostService {
                 new Date(),
                 0);
         postDAO.create(post);
-        return postUuid;
+        return post.toApiModel(forum.getName(), authorName, new Date(), null);
     }
 
     public void vote(UUID postUuid, UUID userUuid, Direction direction) {

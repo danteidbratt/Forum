@@ -44,6 +44,7 @@ public class PostServiceTest {
             postService.createPost(
                     forumUuid,
                     UUID.randomUUID(),
+                    "some name",
                     "some title",
                     "some content"
             );
@@ -66,7 +67,7 @@ public class PostServiceTest {
         when(forumDao.getForum(eq(forumUuid))).thenReturn(Optional.of(mock(Forum.class)));
 
         // Act
-        postService.createPost(forumUuid, userUuid, title, content);
+        postService.createPost(forumUuid, userUuid, "some name", title, content);
 
         // Assert
         ArgumentCaptor<Post> argumentCaptor = ArgumentCaptor.forClass(Post.class);
@@ -88,7 +89,7 @@ public class PostServiceTest {
         when(forumDao.getForum(eq(forumUuid))).thenReturn(Optional.of(mock(Forum.class)));
 
         // Act
-        postService.createPost(forumUuid, userUuid, title, content);
+        postService.createPost(forumUuid, userUuid, "some name", title, content);
 
         // Assert
         ArgumentCaptor<Post> argumentCaptor = ArgumentCaptor.forClass(Post.class);

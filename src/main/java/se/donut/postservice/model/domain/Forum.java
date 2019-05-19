@@ -35,7 +35,7 @@ public class Forum extends Submission {
                 this.getAuthorUuid(),
                 authorName,
                 this.getName(),
-                this.getName(),
+                this.getContent(),
                 this.getScore(),
                 subscribed
         );
