@@ -28,6 +28,6 @@ public class UserAuthenticator implements Authenticator<BasicCredentials, Authen
                     user.getRole().toString()
             ));
         }
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 }

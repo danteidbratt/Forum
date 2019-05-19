@@ -10,13 +10,11 @@ import se.donut.postservice.repository.postgresql.ForumDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.DataValidator;
-import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static se.donut.postservice.exception.ExceptionType.FORUM_NAME_ALREADY_TAKEN;
-import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.*;
 
 public class ForumService {
 
@@ -26,6 +24,31 @@ public class ForumService {
     public ForumService(UserDAO userDAO, ForumDAO forumDAO) {
         this.userDAO = userDAO;
         this.forumDAO = forumDAO;
+    }
+
+    public ForumDTO getForum(UUID forumUuid) {
+        return getForum(forumUuid, null);
+    }
+
+    public ForumDTO getForum(UUID forumUuid, UUID userUuid) {
+        Forum forum = forumDAO.getForum(forumUuid).orElseThrow(() ->
+                new PostServiceException(
+                        FORUM_NOT_FOUND,
+                        String.format("Could not find forum with uuid %s", forumUuid)
+                )
+        );
+
+        User author = userDAO.get(forum.getAuthorUuid()).orElseThrow(() ->
+                new PostServiceException(
+                        USER_NOT_FOUND,
+                        String.format("Could not find user with uuid %s", forum.getAuthorUuid())
+                )
+        );
+
+        Optional<Subscription> subscription = userUuid != null ?
+                forumDAO.getSubscription(userUuid, forumUuid) : Optional.empty();
+
+        return forum.toApiModel(author.getName(), new Date(), subscription.isPresent());
     }
 
     public List<ForumDTO> getAllForums(SortType sortType) {
@@ -67,6 +90,9 @@ public class ForumService {
 
     public List<ForumDTO> getSubscriptions(UUID userUuid, SortType sortType) {
         List<Forum> forums = forumDAO.getSubscriptions(userUuid);
+        if (forums.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         List<UUID> userUuids = forums.stream()
                 .map(Forum::getAuthorUuid)

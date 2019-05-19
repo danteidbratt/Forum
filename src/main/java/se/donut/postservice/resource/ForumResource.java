@@ -31,6 +31,22 @@ public class ForumResource {
         this.postService = postService;
     }
 
+    @Path("{forumUuid}/guest")
+    @GET
+    public ForumDTO getForumAsGuest(@PathParam("forumUuid") UUID forumUuid) {
+        return forumService.getForum(forumUuid);
+    }
+
+    @PermitAll
+    @Path("{forumUuid}")
+    @GET
+    public ForumDTO getForum(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("forumUuid") UUID forumUuid
+    ) {
+        return forumService.getForum(forumUuid, authenticatedUser.getUuid());
+    }
+
     @Path("guest")
     @GET
     public List<ForumDTO> getAllForumsAsGuest(
