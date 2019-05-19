@@ -56,8 +56,12 @@ public class ForumService {
     }
 
     public List<ForumDTO> getAllForums(SortType sortType, UUID userUuid) {
-        Map<UUID, Subscription> subscriptions;
+        List<Forum> forums = forumDAO.getAllForums();
+        if (forums.isEmpty()) {
+            return new ArrayList<>();
+        }
 
+        Map<UUID, Subscription> subscriptions;
         if (userUuid != null) {
             subscriptions = forumDAO.getSubscriptionsByUser(userUuid)
                     .stream()
@@ -65,8 +69,6 @@ public class ForumService {
         } else {
             subscriptions = new HashMap<>();
         }
-
-        List<Forum> forums = forumDAO.getAllForums();
 
         List<UUID> userUuids = forums.stream()
                 .map(Forum::getAuthorUuid)

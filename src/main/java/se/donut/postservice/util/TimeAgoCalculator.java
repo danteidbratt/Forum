@@ -5,18 +5,18 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeAgoCalculator {
 
-    private static final String SECOND = " second";
-    private static final String SECONDS = " seconds";
-    private static final String MINUTE = " minute";
-    private static final String MINUTES = " minutes";
-    private static final String HOUR = " hour";
-    private static final String HOURS = " hours";
-    private static final String DAY = " day";
-    private static final String DAYS = " days";
-    private static final String MONTH = " month";
-    private static final String MONTHS = " months";
-    private static final String YEAR = " year";
-    private static final String YEARS = " years";
+    private static final String SECOND = " second ago";
+    private static final String SECONDS = " seconds ago";
+    private static final String MINUTE = " minute ago";
+    private static final String MINUTES = " minutes ago";
+    private static final String HOUR = " hour ago";
+    private static final String HOURS = " hours ago";
+    private static final String DAY = " day ago";
+    private static final String DAYS = " days ago";
+    private static final String MONTH = " month ago";
+    private static final String MONTHS = " months ago";
+    private static final String YEAR = " year ago";
+    private static final String YEARS = " years ago";
 
     public static String calculateTimeAgo(Date past, Date now) {
         long diff = now.getTime() - past.getTime();

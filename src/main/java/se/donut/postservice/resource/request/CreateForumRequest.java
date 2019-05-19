@@ -15,7 +15,7 @@ public class CreateForumRequest {
     private String name;
 
     @NotNull
-    @Size(min = 1, max = 1023)
+    @Size(min = 1, max = 2047)
     private String description;
 
 }

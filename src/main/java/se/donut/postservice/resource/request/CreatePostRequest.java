@@ -15,7 +15,7 @@ public class CreatePostRequest {
     private String title;
 
     @NotNull
-    @Size(max = 511)
+    @Size(max = 2047)
     private String content;
 
 }
