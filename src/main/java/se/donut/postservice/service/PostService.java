@@ -73,7 +73,11 @@ public class PostService {
     }
 
     public List<PostDTO> getByLikes(UUID userUuid, SortType sortType) {
-        List<Post> posts = postDAO.getByLikes(userUuid);
+        return getByLikes(userUuid, sortType, null);
+    }
+
+    public List<PostDTO> getByLikes(UUID likerUuid, SortType sortType, UUID userUuid) {
+        List<Post> posts = postDAO.getByLikes(likerUuid);
         return buildApiModels(posts, sortType, userUuid);
     }
 

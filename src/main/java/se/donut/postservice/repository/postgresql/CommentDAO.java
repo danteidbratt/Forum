@@ -36,7 +36,8 @@ public interface CommentDAO {
 
     @SqlQuery("SELECT c.* FROM comment c " +
             "INNER JOIN comment_vote v ON v.target_uuid = c.uuid " +
-            "WHERE v.user_uuid = :userUuid")
+            "WHERE v.user_uuid = :userUuid " +
+            "AND v.direction = 'UP'")
     List<Comment> getCommentsByLikes(@Bind("userUuid") UUID userUuid);
 
     @SqlUpdate("INSERT INTO comment " +

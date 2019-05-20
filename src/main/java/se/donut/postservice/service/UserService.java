@@ -31,7 +31,7 @@ public class UserService {
         return user.toApiModel(carma, new Date());
     }
 
-    public UUID createUser(String username, String password) {
+    public UserDTO createUser(String username, String password) {
         Optional<User> userWithSameName = userDAO.get(username);
 
         DataValidator.validateUsername(username);
@@ -52,7 +52,7 @@ public class UserService {
                 new Date()
         );
         userDAO.createUserWithPassword(user, password);
-        return userUuid;
+        return user.toApiModel(0, new Date());
     }
 
     public UserDTO login(String username, String password) {

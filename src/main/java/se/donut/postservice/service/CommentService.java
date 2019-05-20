@@ -111,8 +111,12 @@ public class CommentService {
         return buildApiModels(comments, sortType, userUuid);
     }
 
-    public List<CommentDTO> getByLikes(UUID userUuid, SortType sortType) {
-        List<Comment> comments = commentDAO.getCommentsByLikes(userUuid);
+    public List<CommentDTO> getByLikes(UUID likerUuid, SortType sortType) {
+        return getByLikes(likerUuid, sortType, null);
+    }
+
+    public List<CommentDTO> getByLikes(UUID likerUuid, SortType sortType, UUID userUuid) {
+        List<Comment> comments = commentDAO.getCommentsByLikes(likerUuid);
         return buildApiModels(comments, sortType, userUuid);
     }
 

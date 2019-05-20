@@ -60,9 +60,8 @@ public class UserResource {
     }
 
     @POST
-    public Response createUser(@Valid CreateUserRequest request) {
-        UUID uuid = userService.createUser(request.getUsername(), request.getPassword());
-        return Response.ok(uuid).build();
+    public UserDTO createUser(@Valid CreateUserRequest request) {
+        return userService.createUser(request.getUsername(), request.getPassword());
     }
 
     @Path("{userUuid}/posts/guest")
@@ -103,6 +102,46 @@ public class UserResource {
             @DefaultValue("New") @QueryParam("sort") SortType sortType
     ) {
         return commentService.getCommentsByAuthor(userUuid, sortType, authenticatedUser.getUuid());
+    }
+
+    @Path("{userUuid}/likes/posts/guest")
+    @GET
+    public List<PostDTO> getLikedPostsAsGuest(
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("NEW") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getByLikes(userUuid, sortType);
+    }
+
+    @PermitAll
+    @Path("{userUuid}/likes/posts")
+    @GET
+    public List<PostDTO> getLikedPosts(
+            @Auth   AuthenticatedUser authenticatedUser,
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("NEW") @QueryParam("sort") SortType sortType
+    ) {
+        return postService.getByLikes(userUuid, sortType, authenticatedUser.getUuid());
+    }
+
+    @Path("{userUuid}/likes/comments/guest")
+    @GET
+    public List<CommentDTO> getLikedCommentsAsGuest(
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("NEW") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getByLikes(userUuid, sortType);
+    }
+
+    @PermitAll
+    @Path("{userUuid}/likes/comments")
+    @GET
+    public List<CommentDTO> getLikedComments(
+            @Auth AuthenticatedUser authenticatedUser,
+            @PathParam("userUuid") UUID userUuid,
+            @DefaultValue("NEW") @QueryParam("sort") SortType sortType
+    ) {
+        return commentService.getByLikes(userUuid, sortType, authenticatedUser.getUuid());
     }
 
 }
