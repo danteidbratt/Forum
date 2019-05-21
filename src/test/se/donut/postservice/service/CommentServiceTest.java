@@ -17,8 +17,10 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static se.donut.postservice.exception.ExceptionType.*;
-import static se.donut.postservice.resource.request.SortType.*;
+import static se.donut.postservice.exception.ExceptionType.COMMENT_NOT_FOUND;
+import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
+import static se.donut.postservice.resource.request.SortType.HOT;
+import static se.donut.postservice.resource.request.SortType.TOP;
 
 public class CommentServiceTest {
 

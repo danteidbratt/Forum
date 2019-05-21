@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 @Setter
 @Getter
-public class CreatePostRequest {
+public final class CreatePostRequest {
 
     @NotNull
     @Size(min = 1, max = 255)

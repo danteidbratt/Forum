@@ -21,7 +21,7 @@ import java.util.UUID;
 @Path("forums")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class ForumResource {
+public final class ForumResource {
 
     private final ForumService forumService;
     private final PostService postService;

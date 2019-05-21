@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
-public class CreateForumRequest {
+public final class CreateForumRequest {
 
     @NotNull
     @Size(min = 3, max = 31)

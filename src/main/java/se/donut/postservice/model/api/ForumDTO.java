@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ForumDTO extends AbstractDTO {
+public final class ForumDTO extends AbstractDTO {
 
     private final UUID authorUuid;
     private final String authorName;

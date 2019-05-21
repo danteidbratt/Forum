@@ -1,5 +1,6 @@
 package se.donut.postservice.service;
 
+import lombok.extern.slf4j.Slf4j;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.ForumDTO;
 import se.donut.postservice.model.domain.Forum;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 
 import static se.donut.postservice.exception.ExceptionType.*;
 
-public class ForumService {
+@Slf4j
+public final class ForumService {
 
     private final UserDAO userDAO;
     private final ForumDAO forumDAO;
@@ -140,12 +142,13 @@ public class ForumService {
                 forumUuid
         );
         forumDAO.createForumAndSubscribe(forum, subscription);
+        log.info(String.format("Forum '%s' was successfully created.", forum.getName()));
 
         return forum.toApiModel(userName, new Date(), true);
     }
 
     public void subscribe(UUID userUuid, UUID forumUuid) {
-        forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(
+        Forum forum = forumDAO.getForum(forumUuid).orElseThrow(() -> new PostServiceException(
                 FORUM_NOT_FOUND,
                 String.format("Could not find forum with uuid %s.", forumUuid)
         ));
@@ -153,9 +156,15 @@ public class ForumService {
         Subscription subscription = new Subscription(userUuid, forumUuid);
 
         forumDAO.subscribe(subscription);
+        log.info(String.format("User with uuid '%s' was successfully " +
+                        "subscribed to forum '%s'.", userUuid, forum.getName())
+        );
     }
 
     public void unsubscribe(UUID userUuid, UUID forumUuid) {
         forumDAO.unsubscribe(userUuid, forumUuid);
+        log.info(String.format("User with uuid '%s' was successfully " +
+                "unsubscribed from forum with uuid '%s'.", userUuid, forumUuid)
+        );
     }
 }

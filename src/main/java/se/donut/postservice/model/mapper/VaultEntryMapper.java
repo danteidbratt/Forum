@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class VaultEntryMapper implements RowMapper<VaultEntry> {
+public final class VaultEntryMapper implements RowMapper<VaultEntry> {
     @Override
     public VaultEntry map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new VaultEntry(

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
-public class VoteRequest {
+public final class VoteRequest {
 
     @NotNull
     Direction direction;

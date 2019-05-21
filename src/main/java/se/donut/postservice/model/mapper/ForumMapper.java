@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
-public class ForumMapper implements RowMapper<Forum> {
+public final class ForumMapper implements RowMapper<Forum> {
 
     @Override
     public Forum map(ResultSet rs, StatementContext ctx) throws SQLException {

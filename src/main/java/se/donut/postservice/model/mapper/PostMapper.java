@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
-public class PostMapper implements RowMapper<Post> {
+public final class PostMapper implements RowMapper<Post> {
     @Override
     public Post map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new Post(

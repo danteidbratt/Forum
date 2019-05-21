@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class SubscriptionMapper implements RowMapper<Subscription> {
+public final class SubscriptionMapper implements RowMapper<Subscription> {
 
     @Override
     public Subscription map(ResultSet rs, StatementContext ctx) throws SQLException {

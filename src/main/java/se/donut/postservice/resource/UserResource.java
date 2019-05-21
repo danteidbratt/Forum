@@ -15,14 +15,13 @@ import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.UUID;
 
 @Path("users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class UserResource {
+public final class UserResource {
 
     private final UserService userService;
     private final PostService postService;

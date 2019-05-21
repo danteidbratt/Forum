@@ -1,6 +1,6 @@
 package se.donut.postservice.service;
 
-import org.jdbi.v3.sqlobject.transaction.Transaction;
+import lombok.extern.slf4j.Slf4j;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.CommentDTO;
@@ -10,7 +10,6 @@ import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.DataValidator;
-import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,7 +17,8 @@ import java.util.stream.Collectors;
 import static se.donut.postservice.exception.ExceptionType.COMMENT_NOT_FOUND;
 import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
 
-public class CommentService {
+@Slf4j
+public final class CommentService {
 
     private final CommentDAO commentDAO;
     private final PostDAO postDAO;
@@ -70,6 +70,7 @@ public class CommentService {
                 new Date()
         );
         commentDAO.createCommentAndUpdateCounter(comment);
+        log.info("Comment successfully created.");
         CommentDTO commentDTO = comment.toApiModel(authorName, null, new Date());
         commentDTO.setChildren(new ArrayList<>());
         return commentDTO;

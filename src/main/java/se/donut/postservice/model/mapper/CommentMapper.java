@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
-public class CommentMapper implements RowMapper<Comment> {
+public final class CommentMapper implements RowMapper<Comment> {
 
     @Override
     public Comment map(ResultSet rs, StatementContext ctx) throws SQLException {

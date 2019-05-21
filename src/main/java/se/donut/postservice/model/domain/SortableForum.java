@@ -8,7 +8,7 @@ import se.donut.postservice.util.Ranking;
 import static se.donut.postservice.resource.request.SortType.HOT;
 
 @Getter
-public class SortableForum extends Forum implements Sortable {
+public final class SortableForum extends Forum implements Sortable {
 
     private final double heat;
 

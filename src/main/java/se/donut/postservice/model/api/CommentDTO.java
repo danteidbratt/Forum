@@ -14,7 +14,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @Getter
 @Setter
 @JsonInclude(NON_NULL)
-public class CommentDTO extends AbstractDTO{
+public final class CommentDTO extends AbstractDTO{
 
     private final UUID postUuid;
     private final UUID authorUuid;

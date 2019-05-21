@@ -2,7 +2,7 @@ package se.donut.postservice.exception;
 
 import javax.ws.rs.WebApplicationException;
 
-public class PostServiceException extends WebApplicationException {
+public final class PostServiceException extends WebApplicationException {
 
     private final ExceptionType exceptionType;
 

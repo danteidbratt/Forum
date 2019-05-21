@@ -3,7 +3,6 @@ package se.donut.postservice.model.domain;
 import lombok.Getter;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
-import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.Date;
 import java.util.UUID;

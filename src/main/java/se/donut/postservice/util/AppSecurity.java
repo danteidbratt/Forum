@@ -4,9 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class Security {
+public class AppSecurity {
 
     private static final int SALT_LENGTH = 10;
+    private static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+            "abcdefghijklmnopqrstuvwxyz" +
+            "0123456789";
 
     public static String encryptPassword(String password, String salt) {
         try {
@@ -29,7 +32,7 @@ public class Security {
     public static String generateSalt() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < SALT_LENGTH; i++) {
-            sb.append((char) (65 + (int) (Math.random() * 25)));
+            sb.append(SALT_CHARS.charAt((int) (Math.random() * SALT_CHARS.length())));
         }
         return sb.toString();
     }

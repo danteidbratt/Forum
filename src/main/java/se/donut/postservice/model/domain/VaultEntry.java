@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class VaultEntry {
+public final class VaultEntry {
 
     private final UUID userUuid;
     private final String passwordHash;

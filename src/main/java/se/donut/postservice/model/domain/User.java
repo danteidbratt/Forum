@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Getter
-public class User extends AbstractEntity {
+public final class User extends AbstractEntity {
 
     private final String name;
     private final Role role;

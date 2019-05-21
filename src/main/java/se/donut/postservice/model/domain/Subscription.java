@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class Subscription {
+public final class Subscription {
 
     private final UUID userUuid;
     private final UUID forumUuid;

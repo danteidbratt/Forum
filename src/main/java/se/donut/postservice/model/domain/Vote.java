@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class Vote {
+public final class Vote {
 
     private final UUID targetUuid;
     private final UUID userUuid;

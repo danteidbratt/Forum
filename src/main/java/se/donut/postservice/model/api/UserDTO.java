@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Getter
-public class UserDTO extends AbstractDTO {
+public final class UserDTO extends AbstractDTO {
 
     private final String name;
     private final Integer carma;

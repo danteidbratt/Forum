@@ -7,14 +7,14 @@ import io.dropwizard.db.DataSourceFactory;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-public class Config extends Configuration {
+final class Config extends Configuration {
 
     @Valid
     @NotNull
     private DataSourceFactory database = new DataSourceFactory();
 
     @JsonProperty("database")
-    public DataSourceFactory getDatabase() {
+    DataSourceFactory getDatabase() {
         return database;
     }
 }

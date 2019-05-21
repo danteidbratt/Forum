@@ -21,7 +21,7 @@ import java.util.UUID;
 @Path("posts")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class PostResource {
+public final class PostResource {
 
     private final PostService postService;
     private final CommentService commentService;

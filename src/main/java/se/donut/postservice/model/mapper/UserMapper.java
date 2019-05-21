@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.UUID;
 
-public class UserMapper implements RowMapper<User> {
+public final class UserMapper implements RowMapper<User> {
     @Override
     public User map(ResultSet rs, StatementContext ctx) throws SQLException {
         return new User(

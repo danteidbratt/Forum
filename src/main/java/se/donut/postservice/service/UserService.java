@@ -1,12 +1,13 @@
 package se.donut.postservice.service;
 
+import lombok.extern.slf4j.Slf4j;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.model.domain.User;
 import se.donut.postservice.model.domain.VaultEntry;
 import se.donut.postservice.repository.postgresql.UserDAO;
+import se.donut.postservice.util.AppSecurity;
 import se.donut.postservice.util.DataValidator;
-import se.donut.postservice.util.Security;
 
 import java.util.Date;
 import java.util.Optional;
@@ -16,7 +17,8 @@ import static se.donut.postservice.exception.ExceptionType.USERNAME_ALREADY_TAKE
 import static se.donut.postservice.exception.ExceptionType.USER_NOT_FOUND;
 import static se.donut.postservice.model.domain.Role.USER;
 
-public class UserService {
+@Slf4j
+public final class UserService {
 
     private final UserDAO userDAO;
 
@@ -38,8 +40,8 @@ public class UserService {
 
         DataValidator.validateUsername(username);
         DataValidator.validatePassword(password);
-        String salt = Security.generateSalt();
-        String passwordHash = Security.encryptPassword(password, salt);
+        String salt = AppSecurity.generateSalt();
+        String passwordHash = AppSecurity.encryptPassword(password, salt);
 
         if (userWithSameName.isPresent()) {
             throw new PostServiceException(
@@ -61,6 +63,7 @@ public class UserService {
                 salt
         );
         userDAO.createUserWithPassword(user, vaultEntry);
+        log.info(String.format("User with username '%s' was successfully created.", username));
         return user.toApiModel(0, new Date());
     }
 

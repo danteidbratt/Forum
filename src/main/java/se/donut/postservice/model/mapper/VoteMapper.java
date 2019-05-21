@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class VoteMapper implements RowMapper<Vote> {
+public final class VoteMapper implements RowMapper<Vote> {
 
     @Override
     public Vote map(ResultSet rs, StatementContext ctx) throws SQLException {

@@ -3,7 +3,7 @@ package se.donut.postservice.auth;
 import java.security.Principal;
 import java.util.UUID;
 
-public class AuthenticatedUser implements Principal {
+public final class AuthenticatedUser implements Principal {
 
     private final UUID uuid;
     private final String name;

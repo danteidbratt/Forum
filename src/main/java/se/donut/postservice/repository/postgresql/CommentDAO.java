@@ -7,7 +7,6 @@ import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
-import se.donut.postservice.model.api.PostDTO;
 import se.donut.postservice.model.domain.Comment;
 import se.donut.postservice.model.domain.Vote;
 

@@ -27,7 +27,7 @@ import se.donut.postservice.service.ForumService;
 import se.donut.postservice.service.PostService;
 import se.donut.postservice.service.UserService;
 
-public class App extends Application<Config> {
+public final class App extends Application<Config> {
 
     public static void main(String[] args) throws Exception {
         App app = new App();

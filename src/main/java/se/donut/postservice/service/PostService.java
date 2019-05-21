@@ -1,5 +1,6 @@
 package se.donut.postservice.service;
 
+import lombok.extern.slf4j.Slf4j;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.Direction;
 import se.donut.postservice.model.api.PostDTO;
@@ -9,7 +10,6 @@ import se.donut.postservice.repository.postgresql.PostDAO;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.resource.request.SortType;
 import se.donut.postservice.util.DataValidator;
-import se.donut.postservice.util.TimeAgoCalculator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +17,8 @@ import java.util.stream.Collectors;
 import static se.donut.postservice.exception.ExceptionType.FORUM_NOT_FOUND;
 import static se.donut.postservice.exception.ExceptionType.POST_NOT_FOUND;
 
-public class PostService {
+@Slf4j
+public final class PostService {
 
     private final UserDAO userDAO;
     private final PostDAO postDAO;
@@ -113,6 +114,7 @@ public class PostService {
                 new Date(),
                 0);
         postDAO.create(post);
+        log.info("Post was successfully created.");
         return post.toApiModel(forum.getName(), authorName, new Date(), null);
     }
 

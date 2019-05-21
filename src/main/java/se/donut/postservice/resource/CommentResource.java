@@ -17,7 +17,7 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Path("comments")
-public class CommentResource {
+public final class CommentResource {
 
     private final CommentService commentService;
 

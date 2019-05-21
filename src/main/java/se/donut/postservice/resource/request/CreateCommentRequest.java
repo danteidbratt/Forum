@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-public class CreateCommentRequest {
+public final class CreateCommentRequest {
 
     @NotNull
     private UUID parentUuid;
