@@ -132,15 +132,14 @@ public class ForumService {
                 userUuid,
                 name,
                 description,
-                0,
+                1,
                 now
         );
         Subscription subscription = new Subscription(
                 userUuid,
                 forumUuid
         );
-        forumDAO.createForum(forum);
-        forumDAO.subscribe(subscription);
+        forumDAO.createForumAndSubscribe(forum, subscription);
 
         return forum.toApiModel(userName, new Date(), true);
     }

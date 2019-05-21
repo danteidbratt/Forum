@@ -78,6 +78,12 @@ public interface ForumDAO {
     List<Subscription> getSubscriptionsByUser(@Bind("userUuid") UUID userUuid);
 
     @Transaction
+    default void createForumAndSubscribe(Forum forum, Subscription subscription) {
+        createForum(forum);
+        createSubscription(subscription);
+    }
+
+    @Transaction
     default void subscribe(Subscription subscription) {
         int rowsAffected = createSubscription(subscription);
         if (rowsAffected == 1) {

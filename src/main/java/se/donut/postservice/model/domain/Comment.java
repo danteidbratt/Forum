@@ -32,6 +32,7 @@ public class Comment extends Submission {
                 this.getUuid(),
                 this.getCreatedAt(),
                 now,
+                this.getPostUuid(),
                 this.getAuthorUuid(),
                 authorName,
                 this.getContent(),

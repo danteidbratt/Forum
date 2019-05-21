@@ -16,6 +16,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 @JsonInclude(NON_NULL)
 public class CommentDTO extends AbstractDTO{
 
+    private final UUID postUuid;
     private final UUID authorUuid;
     private final String authorName;
     private final String content;
@@ -28,6 +29,7 @@ public class CommentDTO extends AbstractDTO{
             UUID uuid,
             Date createdAt,
             Date now,
+            UUID postUuid,
             UUID authorUuid,
             String authorName,
             String content,
@@ -35,6 +37,7 @@ public class CommentDTO extends AbstractDTO{
             Direction myVote
     ) {
         super(uuid, createdAt, now);
+        this.postUuid = postUuid;
         this.authorUuid = authorUuid;
         this.authorName = authorName;
         this.content = content;

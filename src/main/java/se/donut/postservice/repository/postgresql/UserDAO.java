@@ -10,6 +10,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import org.jdbi.v3.sqlobject.transaction.Transaction;
 import se.donut.postservice.model.domain.User;
+import se.donut.postservice.model.domain.VaultEntry;
 import se.donut.postservice.model.mapper.UserMapper;
 
 import java.util.List;
@@ -51,19 +52,9 @@ public interface UserDAO {
     void createUser(@BindBean User user);
 
     @Transaction
-    default void createUserWithPassword(User user, String password) {
+    default void createUserWithPassword(User user, VaultEntry vaultEntry) {
         createUser(user);
-        getVault().create(user.getUuid(), password);
+        getVault().create(vaultEntry);
     }
 
-    default Optional<User> authenticate(String username, String password) {
-        Optional<User> user = get(username);
-        if (user.isPresent()) {
-            int match = getVault().match(user.get().getUuid(), password);
-            if (match == 1) {
-                return user;
-            }
-        }
-        return Optional.empty();
-    }
 }

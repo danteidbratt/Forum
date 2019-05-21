@@ -3,8 +3,10 @@ package se.donut.postservice.service;
 import se.donut.postservice.exception.PostServiceException;
 import se.donut.postservice.model.api.UserDTO;
 import se.donut.postservice.model.domain.User;
+import se.donut.postservice.model.domain.VaultEntry;
 import se.donut.postservice.repository.postgresql.UserDAO;
 import se.donut.postservice.util.DataValidator;
+import se.donut.postservice.util.Security;
 
 import java.util.Date;
 import java.util.Optional;
@@ -36,6 +38,8 @@ public class UserService {
 
         DataValidator.validateUsername(username);
         DataValidator.validatePassword(password);
+        String salt = Security.generateSalt();
+        String passwordHash = Security.encryptPassword(password, salt);
 
         if (userWithSameName.isPresent()) {
             throw new PostServiceException(
@@ -51,17 +55,13 @@ public class UserService {
                 USER,
                 new Date()
         );
-        userDAO.createUserWithPassword(user, password);
+        VaultEntry vaultEntry = new VaultEntry(
+                userUuid,
+                passwordHash,
+                salt
+        );
+        userDAO.createUserWithPassword(user, vaultEntry);
         return user.toApiModel(0, new Date());
-    }
-
-    public UserDTO login(String username, String password) {
-        Optional<User> user = userDAO.authenticate(username, password);
-        if (user.isPresent()) {
-            int carma = userDAO.getCarma(user.get().getUuid());
-            return user.get().toApiModel(carma, new Date());
-        }
-        return null;
     }
 
 }

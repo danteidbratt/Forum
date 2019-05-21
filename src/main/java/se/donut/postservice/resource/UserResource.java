@@ -49,16 +49,6 @@ public class UserResource {
         return userService.getUser(authenticatedUser.getUuid());
     }
 
-
-    @PermitAll
-    @Path("login")
-    @GET
-    public UserDTO login(
-            @Auth AuthenticatedUser authenticatedUser
-    ) {
-        return userService.getUser(authenticatedUser.getUuid());
-    }
-
     @POST
     public UserDTO createUser(@Valid CreateUserRequest request) {
         return userService.createUser(request.getUsername(), request.getPassword());

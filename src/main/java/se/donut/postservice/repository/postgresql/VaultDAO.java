@@ -1,24 +1,23 @@
 package se.donut.postservice.repository.postgresql;
 
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import se.donut.postservice.model.domain.VaultEntry;
 
 import java.util.UUID;
 
 public interface VaultDAO {
 
-    @SqlQuery("SELECT count(*) FROM vault " +
-            "WHERE user_uuid = :userUuid AND password = :password")
-    int match(@Bind("userUuid") UUID userUuid,
-              @Bind("password") String password
-    );
+    @SqlQuery("SELECT * FROM vault " +
+            "WHERE user_uuid = :userUuid")
+    VaultEntry getByUserUuid(@Bind("userUuid") UUID userUuid);
 
-    @SqlUpdate("INSERT INTO vault (user_uuid, password) " +
-            "VALUES (:userUuid, :password)")
+    @SqlUpdate("INSERT INTO vault (user_uuid, password_hash, salt) " +
+            "VALUES (:userUuid, :passwordHash, :salt)")
     void create(
-            @Bind("userUuid") UUID userUuid,
-            @Bind("password") String password
+            @BindBean VaultEntry vaultEntry
     );
 
     @SqlUpdate("DELETE FROM vault WHERE user_uuid = :userUuid")

@@ -17,10 +17,7 @@ import se.donut.postservice.auth.UserAuthenticator;
 import se.donut.postservice.auth.UserAuthorizer;
 import se.donut.postservice.filter.CorsFilter;
 import se.donut.postservice.model.mapper.*;
-import se.donut.postservice.repository.postgresql.CommentDAO;
-import se.donut.postservice.repository.postgresql.ForumDAO;
-import se.donut.postservice.repository.postgresql.PostDAO;
-import se.donut.postservice.repository.postgresql.UserDAO;
+import se.donut.postservice.repository.postgresql.*;
 import se.donut.postservice.resource.CommentResource;
 import se.donut.postservice.resource.ForumResource;
 import se.donut.postservice.resource.PostResource;
@@ -53,11 +50,13 @@ public class App extends Application<Config> {
         jdbi.registerRowMapper(new CommentMapper());
         jdbi.registerRowMapper(new VoteMapper());
         jdbi.registerRowMapper(new SubscriptionMapper());
+        jdbi.registerRowMapper(new VaultEntryMapper());
 
         CommentDAO commentDAO = jdbi.onDemand(CommentDAO.class);
         PostDAO postDAO = jdbi.onDemand(PostDAO.class);
         UserDAO userDAO = jdbi.onDemand(UserDAO.class);
         ForumDAO forumDAO = jdbi.onDemand(ForumDAO.class);
+        VaultDAO vaultDAO = jdbi.onDemand(VaultDAO.class);
 
         UserService userService = new UserService(userDAO);
         ForumService forumService = new ForumService(userDAO, forumDAO);
@@ -71,7 +70,7 @@ public class App extends Application<Config> {
 
         environment.jersey().register(new AuthDynamicFeature(
                 new BasicCredentialAuthFilter.Builder<AuthenticatedUser>()
-                        .setAuthenticator(new UserAuthenticator(userService))
+                        .setAuthenticator(new UserAuthenticator(userDAO, vaultDAO))
                         .setAuthorizer(new UserAuthorizer())
                         .setRealm("authentication")
                         .buildAuthFilter()));
